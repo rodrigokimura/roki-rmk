@@ -69,6 +69,7 @@ encoders  = [["Up", "Down"], ["Up", "Down"]]
 
 [ble]
 enabled = true
+battery_adc_pin = "vddh"
 
 [storage]
 enabled = true
