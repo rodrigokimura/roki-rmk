@@ -87,6 +87,10 @@ row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_02", "P1_15", "P1_13", "P1_11", "P0_10", "P0_09"]
 
+[[split.central.output]]
+pin = "P0_13"
+initial_state_active = false
+
 [[split.peripheral]]
 rows = 5
 cols = 6
@@ -97,6 +101,10 @@ col_offset = 6
 row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
+
+[[split.peripheral.output]]
+pin = "P0_13"
+initial_state_active = false
 
 # Encoder on the left half (central)
 [[input_device.encoder]]
@@ -113,7 +121,3 @@ pin_b = "P0_20"
 phase = "resolution"
 resolution = 4
 reverse = false
-
-[[output]]
-pin = "P0_13"
-initial_state_active = false
