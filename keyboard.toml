@@ -10,8 +10,8 @@ chip = "nrf52840"
 ble_profiles_num = 3
 
 [layout]
-rows = 10
-cols = 6
+rows = 5
+cols = 12
 layers = 2
 matrix_map = """
 (0, 0, L) (0, 1, L) (0, 2, L) (0, 3, L) (0, 4, L) (0, 5, L)    (0, 6, R) (0, 7, R) (0, 8, R) (0, 9, R) (0, 10, R) (0, 11, R)
@@ -49,11 +49,11 @@ matrix_map = """
 
 [[layer]]  # Layer 0
 keys = """
-           "Escape"  "Kc1"  "Kc2"  "Kc3"  "Kc4"  "Kc5"        "Kc6"  "Kc7"  "Kc8"  "Kc9"  "Kc0"  "Escape"
-           "Tab"  "Q"  "W"  "E"  "R"  "T"                     "Y"  "U"  "I"  "O"  "P"  "Grave"
-           "LShift"  "A"  "S"  "D"  "F"  "G"                  "H"  "J"  "K"  "L"  "Slash"  "RShift"
-           "MO(1)"  "Z"  "X"  "C"  "V"  "B"                   "N"  "M"  "Comma"  "Dot"  "Backslash"  "MO(1)"
-           "LCtrl"  "LGui"  "LAlt"  "Space"  "Enter"  "No"    "No"  "Backspace"  "Space"  "RAlt"  "RGui"  "RCtrl
+           "Escape" "Kc1"   "Kc2"   "Kc3"   "Kc4"  "Kc5"        "Kc6"  "Kc7"  "Kc8"  "Kc9"  "Kc0"  "Escape"
+           "Tab"    "Q"     "W"     "E"     "R"  "T"                     "Y"  "U"  "I"  "O"  "P"  "Grave"
+           "LShift" "A"     "S"     "D"     "F"  "G"                  "H"  "J"  "K"  "L"  "Slash"  "RShift"
+           "MO(1)"  "Z"     "X"     "C"     "V"  "B"                   "N"  "M"  "Comma"  "Dot"  "Backslash"  "MO(1)"
+           "LCtrl"  "LGui"  "LAlt"  "Space" "Enter"  "No"    "No"  "Backspace"  "Space"  "RAlt"  "RGui"  "RCtrl
 """
 encoders  = [["AudioVolUp",  "AudioVolDown"], ["AudioVolUp", "AudioVolDown"]]
 
@@ -90,8 +90,8 @@ col_pins = ["P0_02", "P1_15", "P1_13", "P1_11", "P0_10", "P0_09"]
 [[split.peripheral]]
 rows = 5
 cols = 6
-row_offset = 5
-col_offset = 0
+row_offset = 0
+col_offset = 6
 
 [split.peripheral.matrix]
 row2col = true
