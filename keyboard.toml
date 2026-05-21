@@ -1,0 +1,86 @@
+[keyboard]
+name = "RoKi"
+product_name = "RoKi Keyboard"
+vendor_id = 0x4c4b
+product_id = 0x524b
+manufacturer = "RoKi"
+chip = "nrf52840"
+
+[layout]
+rows = 10
+cols = 6
+layers = 2
+keymap = [
+    [
+        ["Escape", "Kc1", "Kc2", "Kc3", "Kc4", "Kc5"],
+        ["Tab", "Q", "W", "E", "R", "T"],
+        ["LShift", "A", "S", "D", "F", "G"],
+        ["MO(1)", "Z", "X", "C", "V", "B"],
+        ["LCtrl", "LGui", "LAlt", "Space", "Enter", "No"],
+        ["Kc6", "Kc7", "Kc8", "Kc9", "Kc0", "Escape"],
+        ["Y", "U", "I", "O", "P", "Grave"],
+        ["H", "J", "K", "L", "Slash", "RShift"],
+        ["N", "M", "Comma", "Dot", "Backslash", "MO(1)"],
+        ["No", "Backspace", "Space", "RAlt", "RGui", "RCtrl"]
+    ],
+    [
+        ["F1", "F2", "F3", "F4", "F5", "F6"],
+        ["No", "No", "No", "No", "No", "No"],
+        ["LShift", "Quote", "No", "No", "No", "No"],
+        ["MO(1)", "No", "No", "Semicolon", "No", "No"],
+        ["LCtrl", "LGui", "LAlt", "No", "No", "No"],
+        ["F7", "F8", "F9", "F10", "F11", "F12"],
+        ["MouseLeft", "MouseDown", "MouseUp", "MouseRight", "MediaPlayPause", "AudioVolUp"],
+        ["Left", "Down", "Up", "Right", "No", "AudioVolDown"],
+        ["Minus", "Equal", "LeftBracket", "No", "No", "MO(1)"],
+        ["No", "Delete", "No", "RAlt", "RGui", "RCtrl"]
+    ]
+]
+encoder_map = [
+    [["AudioVolUp", "AudioVolDown"], ["Up", "Down"]],
+    [["AudioVolUp", "AudioVolDown"], ["Up", "Down"]]
+]
+
+[ble]
+enabled = true
+
+[storage]
+
+[split]
+connection = "ble"
+
+[split.central]
+rows = 5
+cols = 6
+row_offset = 0
+col_offset = 0
+
+[split.central.matrix]
+row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
+col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
+
+[[split.peripheral]]
+rows = 5
+cols = 6
+row_offset = 5
+col_offset = 0
+
+[split.peripheral.matrix]
+row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
+col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
+
+# Encoder on the left half (central)
+[[input_device.encoder]]
+pin_a = "P0_17"
+pin_b = "P0_20"
+phase = "resolution"
+resolution = 4
+reverse = false
+
+# Encoder on the right half (peripheral) — same PCB, same pins
+[[input_device.encoder]]
+pin_a = "P0_17"
+pin_b = "P0_20"
+phase = "resolution"
+resolution = 4
+reverse = false
