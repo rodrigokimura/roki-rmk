@@ -55,7 +55,7 @@ keys = """
            "MO(1)"  "Z"  "X"  "C"  "V"  "B"                   "N"  "M"  "Comma"  "Dot"  "Backslash"  "MO(1)"
            "LCtrl"  "LGui"  "LAlt"  "Space"  "Enter"  "No"    "No"  "Backspace"  "Space"  "RAlt"  "RGui"  "RCtrl
 """
-encoders  = [["AudioVolUp"  "AudioVolDown"], ["AudioVolUp", "AudioVolDown"]]
+encoders  = [["AudioVolUp",  "AudioVolDown"], ["AudioVolUp", "AudioVolDown"]]
 
 [[layer]]  # Layer 1
 keys = """
