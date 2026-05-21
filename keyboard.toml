@@ -64,6 +64,12 @@ keys = """
            LShift A     S     D     F     G     H   J         K     L     Slash     RShift
            MO(1)  Z     X     C     V     B     N   M         Comma Dot   Backslash MO(1)
            LCtrl  LGui  LAlt  Space Enter No    No  Backspace Space RAlt  RGui      RCtrl
+
+         F1 F2 F3 F4 F5 F6      F7 F8 F9 F10 F11 F12
+         _ _  _ _ _ _     MouseLeft MouseDown MouseUp MouseRight MediaPlayPause AudioVolUp
+         LShift Quote _ _ _ _     Left Down Up Right _ AudioVolDown
+         MO(1) _ _ Semicolon _ _  Minus Equal LeftBracket _ _ MO(1)
+         LCtrl LGui LAlt _ _ _     _ Delete _ RAlt RGui RCtrl
 """
 encoders  = [["Up", "Down"], ["Up", "Down"]]
 
