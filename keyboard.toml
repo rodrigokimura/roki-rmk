@@ -49,21 +49,21 @@ matrix_map = """
 
 [[layer]]  # Layer 0
 keys = """
-           "Escape" "Kc1"   "Kc2"   "Kc3"   "Kc4"  "Kc5"        "Kc6"  "Kc7"  "Kc8"  "Kc9"  "Kc0"  "Escape"
-           "Tab"    "Q"     "W"     "E"     "R"  "T"                     "Y"  "U"  "I"  "O"  "P"  "Grave"
-           "LShift" "A"     "S"     "D"     "F"  "G"                  "H"  "J"  "K"  "L"  "Slash"  "RShift"
-           "MO(1)"  "Z"     "X"     "C"     "V"  "B"                   "N"  "M"  "Comma"  "Dot"  "Backslash"  "MO(1)"
-           "LCtrl"  "LGui"  "LAlt"  "Space" "Enter"  "No"    "No"  "Backspace"  "Space"  "RAlt"  "RGui"  "RCtrl
+           Escape Kc1   Kc2   Kc3   Kc4   Kc5   Kc6 Kc7       Kc8   Kc9   Kc0       Escape
+           Tab    Q     W     E     R     T     Y   U         I     O     P         Grave
+           LShift A     S     D     F     G     H   J         K     L     Slash     RShift
+           MO(1)  Z     X     C     V     B     N   M         Comma Dot   Backslash MO(1)
+           LCtrl  LGui  LAlt  Space Enter No    No  Backspace Space RAlt  RGui      RCtrl
 """
 encoders  = [["AudioVolUp",  "AudioVolDown"], ["AudioVolUp", "AudioVolDown"]]
 
 [[layer]]  # Layer 1
 keys = """
-           "Escape"  "Kc1"  "Kc2"  "Kc3"  "Kc4"  "Kc5"        "Kc6"  "Kc7"  "Kc8"  "Kc9"  "Kc0"  "Escape"
-           "Tab"  "Q"  "W"  "E"  "R"  "T"                     "Y"  "U"  "I"  "O"  "P"  "Grave"
-           "LShift"  "A"  "S"  "D"  "F"  "G"                  "H"  "J"  "K"  "L"  "Slash"  "RShift"
-           "MO(1)"  "Z"  "X"  "C"  "V"  "B"                   "N"  "M"  "Comma"  "Dot"  "Backslash"  "MO(1)"
-           "LCtrl"  "LGui"  "LAlt"  "Space"  "Enter"  "No"    "No"  "Backspace"  "Space"  "RAlt"  "RGui"  "RCtrl
+           Escape Kc1   Kc2   Kc3   Kc4   Kc5   Kc6 Kc7       Kc8   Kc9   Kc0       Escape
+           Tab    Q     W     E     R     T     Y   U         I     O     P         Grave
+           LShift A     S     D     F     G     H   J         K     L     Slash     RShift
+           MO(1)  Z     X     C     V     B     N   M         Comma Dot   Backslash MO(1)
+           LCtrl  LGui  LAlt  Space Enter No    No  Backspace Space RAlt  RGui      RCtrl
 """
 encoders  = [["Up", "Down"], ["Up", "Down"]]
 
