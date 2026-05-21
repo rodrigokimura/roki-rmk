@@ -115,11 +115,11 @@ phase = "resolution"
 resolution = 4
 reverse = false
 
-[[split.central.output]]
-pin = "P0_13"
-initial_state_active = false
-
-[[split.peripheral.output]]
-pin = "P0_13"
-initial_state_active = false
+# [[split.central.output]]
+# pin = "P0_13"
+# initial_state_active = false
+#
+# [[split.peripheral.output]]
+# pin = "P0_13"
+# initial_state_active = false
 
