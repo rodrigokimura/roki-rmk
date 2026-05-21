@@ -45,6 +45,9 @@ encoder_map = [
 enabled = true
 
 [storage]
+# Clear stored keymaps and bond info on every boot
+# (Remove this line after you've confirmed the layout is correct)
+clear_storage = true
 
 [split]
 connection = "ble"
@@ -56,6 +59,7 @@ row_offset = 0
 col_offset = 0
 
 [split.central.matrix]
+row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
 
@@ -66,6 +70,7 @@ row_offset = 5
 col_offset = 0
 
 [split.peripheral.matrix]
+row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
 
