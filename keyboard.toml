@@ -25,7 +25,7 @@ keymap = [
     ],
     [
         ["F1", "F2", "F3", "F4", "F5", "F6"],
-        ["No", "No", "No", "No", "No", "No"],
+        ["CLR_BT", "BT0", "BT1", "No", "No", "No"],
         ["LShift", "Quote", "No", "No", "No", "No"],
         ["MO(1)", "No", "No", "Semicolon", "No", "No"],
         ["LCtrl", "LGui", "LAlt", "No", "No", "No"],
