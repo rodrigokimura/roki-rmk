@@ -61,7 +61,7 @@ col_offset = 0
 [split.central.matrix]
 row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
-col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
+col_pins = ["P0_02", "P1_15", "P1_13", "P1_11", "P0_10", "P0_09"]
 
 [[split.peripheral]]
 rows = 5
