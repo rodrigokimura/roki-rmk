@@ -28,7 +28,7 @@ keymap = [
     ],
     [
         ["F1", "F2", "F3", "F4", "F5", "F6"],
-        ["User5", "User0 ", "User1", "User3", "No", "No"],
+        ["No", "No ", "No", "No", "No", "No"],
         ["LShift", "Quote", "No", "No", "No", "No"],
         ["MO(1)", "No", "No", "Semicolon", "No", "No"],
         ["LCtrl", "LGui", "LAlt", "No", "No", "No"],
@@ -39,18 +39,18 @@ keymap = [
         ["No", "Delete", "No", "RAlt", "RGui", "RCtrl"]
     ]
 ]
-encoder_map = [
-    [["AudioVolUp", "AudioVolDown"], ["Up", "Down"]],
-    [["AudioVolUp", "AudioVolDown"], ["Up", "Down"]]
-]
+
+[[layer]]  # Layer 0
+encoders  = [["AudioVolUp", "AudioVolDown"], ["AudioVolUp", "AudioVolDown"]]
+
+[[layer]]  # Layer 1
+encoders  = [["Up", "Down"], ["Up", "Down"]]
 
 [ble]
 enabled = true
 
 [storage]
-# Clear stored keymaps and bond info on every boot
-# (Remove this line after you've confirmed the layout is correct)
-clear_storage = true
+enabled = true
 
 [split]
 connection = "ble"
@@ -92,3 +92,7 @@ pin_b = "P0_20"
 phase = "resolution"
 resolution = 4
 reverse = false
+
+[[output]]
+pin = "P0_13"
+initial_state_active = false
