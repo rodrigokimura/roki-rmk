@@ -58,6 +58,7 @@ rows = 0
 cols = 0
 row_offset = 0
 col_offset = 0
+ble_addr = [0xde, 0x21, 0x8e, 0xc7, 0x2e, 0xce]
 
 [split.central.matrix]
 matrix_type = "direct_pin"
@@ -68,23 +69,14 @@ rows = 5
 cols = 6
 row_offset = 0
 col_offset = 0
+ble_addr = [0x44, 0x3e, 0x55, 0x00, 0x61, 0xd7]
 
 [split.peripheral.matrix]
 row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_02", "P1_15", "P1_13", "P1_11", "P0_10", "P0_09"]
 
-[[split.peripheral]]
-rows = 5
-cols = 6
-row_offset = 0
-col_offset = 6
-
-[split.peripheral.matrix]
-row2col = true
-row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
-col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
-
+# Encoder on the left half (peripheral 1)
 [[split.peripheral.input_device.encoder]]
 pin_a = "P0_17"
 pin_b = "P0_20"
@@ -93,15 +85,7 @@ resolution = 4
 reverse = false
 internal_pullup = true
 
-# Encoder on the right half (peripheral) — same PCB, same pins
-[[split.peripheral.input_device.encoder]]
-pin_a = "P0_17"
-pin_b = "P0_20"
-phase = "resolution"
-resolution = 4
-reverse = false
-internal_pullup = true
-
+# Joystick on the left half (peripheral 1)
 [[split.peripheral.input_device.joystick]]
 name = "default"
 pin_x = "P0_31"
@@ -111,6 +95,28 @@ transform = [[80, 0], [0, 80]]
 bias = [29130, 29365]
 resolution = 6
 
+[[split.peripheral]]
+rows = 5
+cols = 6
+row_offset = 0
+col_offset = 6
+ble_addr = [0x9f, 0xbb, 0xef, 0x6e, 0x95, 0xe3]
+
+[split.peripheral.matrix]
+row2col = true
+row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
+col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
+
+# Encoder on the right half (peripheral 2)
+[[split.peripheral.input_device.encoder]]
+pin_a = "P0_17"
+pin_b = "P0_20"
+phase = "resolution"
+resolution = 4
+reverse = false
+internal_pullup = true
+
+# Joystick on the right half (peripheral 2)
 [[split.peripheral.input_device.joystick]]
 name = "default"
 pin_x = "P0_31"
