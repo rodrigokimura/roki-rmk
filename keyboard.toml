@@ -72,7 +72,7 @@ matrix_type = "direct_pin"
 direct_pins = []
 
 [[split.central.input_device.joystick]]
-name = "lstick"
+name = "dstick"
 pin_x = "P0_31"
 pin_y = "P0_29"
 pin_z = "_"
