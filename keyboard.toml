@@ -7,7 +7,7 @@ manufacturer = "RoKi"
 chip = "nrf52840"
 
 [rmk]
-ble_profiles_num = 3
+ble_profiles_num = 1
 
 [layout]
 rows = 5
@@ -53,12 +53,22 @@ enabled = true
 connection = "ble"
 
 [split.central]
+rows = 0
+cols = 0
+row_offset = 0
+col_offset = 0
+
+[split.central.matrix]
+matrix_type = "direct_pin"
+direct_pins = [[]]
+
+[[split.peripheral]]
 rows = 5
 cols = 6
 row_offset = 0
 col_offset = 0
 
-[split.central.matrix]
+[split.peripheral.matrix]
 row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_02", "P1_15", "P1_13", "P1_11", "P0_10", "P0_09"]
@@ -74,8 +84,7 @@ row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
 
-# Encoder on the left half (central)
-[[split.central.input_device.encoder]]
+[[split.peripheral.input_device.encoder]]
 pin_a = "P0_17"
 pin_b = "P0_20"
 phase = "resolution"
@@ -92,7 +101,7 @@ resolution = 4
 reverse = false
 internal_pullup = true
 
-[[split.central.input_device.joystick]]
+[[split.peripheral.input_device.joystick]]
 name = "default"
 pin_x = "P0_31"
 pin_y = "P0_29"
