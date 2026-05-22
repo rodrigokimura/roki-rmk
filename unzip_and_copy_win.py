@@ -4,12 +4,16 @@ import os
 import sys
 import tempfile
 
-if len(sys.argv) < 2 or sys.argv[1].lower() not in ("c", "p"):
-    print("Usage: python unzip_and_copy_win.py <c|p> (c=central, p=peripheral)")
+if len(sys.argv) < 2 or sys.argv[1].lower() not in "dlr":
+    print("Usage: python unzip_and_copy_win.py <c|p> (d=dongle, l=left, r=right)")
     sys.exit(1)
 
 arg = sys.argv[1].lower()
-target_file = "RoKi-central.uf2" if arg == "c" else "RoKi-peripheral.uf2"
+target_file = {
+    "d": "RoKi-central.uf2",
+    "l": "RoKi-peripheral.uf2",
+    "r": "RoKi-peripheral2.uf2",
+}[arg]
 
 zip_path = r"C:\Users\kimur\Downloads\RoKi-firmware_uf2.zip"
 dest_path = r"D:\\"
