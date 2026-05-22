@@ -1,5 +1,4 @@
 import zipfile
-import shutil
 import os
 import sys
 import tempfile
@@ -18,7 +17,17 @@ if len(sys.argv) < 2 or sys.argv[1].lower() not in TARGETS:
 
 arg = sys.argv[1].lower()
 target_file, target_name = TARGETS[arg]
-dest_path = "D:\\"
+dest_path = "/mnt/d/"
+
+def copy_to_windows(src: str, filename: str):
+    """Copy file from WSL to Windows D: drive using PowerShell."""
+    dest_win = f"D:\\{filename}"
+    cmd = [
+        "powershell.exe", "-Command",
+        f'Copy-Item -Path "{src}" -Destination "{dest_win}" -Force'
+    ]
+    subprocess.run(cmd, check=True)
+    print(f"Copied to {dest_win}")
 
 # Check gh CLI is available
 try:
@@ -133,9 +142,7 @@ try:
             if target_file in z.namelist():
                 print(f"Extracting {target_file}...")
                 extracted_path = z.extract(target_file, tmp_dir)
-                dest_file = os.path.join(dest_path, target_file)
-                shutil.copy2(extracted_path, dest_file)
-                print(f"Copied to {dest_file}")
+                copy_to_windows(extracted_path, target_file)
             else:
                 print(f"{target_file} not found in the archive.")
                 print("Files in archive:", z.namelist())
@@ -145,15 +152,17 @@ try:
         for f in extracted_files:
             if f == target_file:
                 src = os.path.join(tmp_dir, f)
-                dest_file = os.path.join(dest_path, f)
-                shutil.copy2(src, dest_file)
-                print(f"Copied to {dest_file}")
+                copy_to_windows(src, f)
                 break
         else:
             print(f"{target_file} not found in downloaded files.")
             print("Files:", extracted_files)
             sys.exit(1)
 
+except subprocess.CalledProcessError as e:
+    print(f"\nPowerShell copy failed: {e}")
+    print("Make sure the D: drive is mounted and writable.")
+    sys.exit(1)
 except PermissionError as e:
     print(f"\nPermission denied: {e}")
     print("If copying to D:\\, make sure the drive is writable.")
@@ -163,4 +172,5 @@ except OSError as e:
     sys.exit(1)
 finally:
     # Cleanup temp dir
+    import shutil
     shutil.rmtree(tmp_dir, ignore_errors=True)
