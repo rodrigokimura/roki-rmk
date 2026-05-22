@@ -43,6 +43,7 @@ encoders = [["Up", "Down"], ["Up", "Down"]]
 
 [ble]
 enabled = true
+default_tx_power = 8
 battery_adc_pin = "vddh"
 
 [storage]
