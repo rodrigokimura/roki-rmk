@@ -8,6 +8,7 @@ chip = "nrf52840"
 
 [rmk]
 ble_profiles_num = 1
+split_peripherals_num = 2
 
 [layout]
 rows = 5
