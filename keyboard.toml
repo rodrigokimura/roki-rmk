@@ -71,6 +71,15 @@ ble_addr = [0xde, 0x21, 0x8e, 0xc7, 0x2e, 0xce]
 matrix_type = "direct_pin"
 direct_pins = []
 
+[[split.central.input_device.joystick]]
+name = "lstick"
+pin_x = "P0_31"
+pin_y = "P0_29"
+pin_z = "_"
+transform = [[0, 0], [0, 0]]
+bias = [0, 0]
+resolution = 1
+
 [[split.peripheral]]
 rows = 5
 cols = 6
