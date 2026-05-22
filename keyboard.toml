@@ -34,17 +34,20 @@ MO(1)  Z     X     C     V     B                                N     M     comm
           lctl   lwin  LAlt  spc   ent   No       No    bspc  spc   RAlt  rwin    rctl
 
 """
-encoders = [["AudioVolUp", "AudioVolDown"], ["AudioVolUp", "AudioVolDown"]]
+encoders = [["AudioVolDown", "AudioVolUp"], ["AudioVolDown", "AudioVolUp"]]
 
 [[layer]] # Layer 1
 keys = """
-         F1 F2 F3 F4 F5 F6      F7 F8 F9 F10 F11 F12
-         User5 User0  User1 User2 _ _     MouseLeft MouseDown MouseUp MouseRight MediaPlayPause AudioVolUp
-         LShift Quote _ _ _ _     Left Down Up Right _ AudioVolDown
-         MO(1) _ _ Semicolon _ _  Minus Equal LeftBracket _ _ MO(1)
-         LCtrl LGui LAlt _ _ _     _ Delete _ RAlt RGui RCtrl
+
+F1 F2 F3 F4 F5 F6      F7 F8 F9 F10 F11 F12
+_ _  _ _ _ _     MouseLeft MouseDown MouseUp MouseRight MediaPlayPause AudioVolUp
+lsft Quote _ _ _ _     Left Down Up Right _ AudioVolDown
+MO(1) _ _ Semicolon _ _  Minus Equal LeftBracket _ _ MO(1)
+
+LCtrl LGui LAlt _ _ _     _ Delete _ RAlt RGui RCtrl
+
 """
-encoders = [["Up", "Down"], ["Up", "Down"]]
+encoders = [["Down", "Up"], ["Down", "Up"]]
 
 [ble]
 enabled = true
@@ -74,22 +77,19 @@ cols = 6
 row_offset = 0
 col_offset = 0
 ble_addr = [0x44, 0x3e, 0x55, 0x00, 0x61, 0xd7]
-
 [split.peripheral.matrix]
 row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_02", "P1_15", "P1_13", "P1_11", "P0_10", "P0_09"]
 
-# Encoder on the left half (peripheral 1)
 [[split.peripheral.input_device.encoder]]
 pin_a = "P0_17"
 pin_b = "P0_20"
 phase = "resolution"
-resolution = 4
+resolution = 2
 reverse = false
 internal_pullup = true
 
-# Joystick on the left half (peripheral 1)
 [[split.peripheral.input_device.joystick]]
 name = "default"
 pin_x = "P0_31"
@@ -98,6 +98,7 @@ pin_z = "_"
 transform = [[80, 0], [0, 80]]
 bias = [29130, 29365]
 resolution = 6
+
 
 [[split.peripheral]]
 rows = 5
@@ -105,22 +106,19 @@ cols = 6
 row_offset = 0
 col_offset = 6
 ble_addr = [0x9f, 0xbb, 0xef, 0x6e, 0x95, 0xe3]
-
 [split.peripheral.matrix]
 row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
 
-# Encoder on the right half (peripheral 2)
 [[split.peripheral.input_device.encoder]]
 pin_a = "P0_17"
 pin_b = "P0_20"
 phase = "resolution"
-resolution = 4
+resolution = 2
 reverse = false
 internal_pullup = true
 
-# Joystick on the right half (peripheral 2)
 [[split.peripheral.input_device.joystick]]
 name = "default"
 pin_x = "P0_31"
@@ -129,11 +127,3 @@ pin_z = "_"
 transform = [[80, 0], [0, 80]]
 bias = [29130, 29365]
 resolution = 6
-
-# [[split.central.output]]
-# pin = "P0_13"
-# initial_state_active = false
-#
-# [[split.peripheral.output]]
-# pin = "P0_13"
-# initial_state_active = false
