@@ -92,6 +92,15 @@ resolution = 4
 reverse = false
 internal_pullup = true
 
+[[input_device.joystick]]
+name = "default"
+pin_x = "P0_31"
+pin_y = "P0_29"
+pin_z = "_"
+transform = [[80, 0], [0, 80]]
+bias = [29130, 29365]
+resolution = 6
+
 # [[split.central.output]]
 # pin = "P0_13"
 # initial_state_active = false
