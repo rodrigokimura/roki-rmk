@@ -19,15 +19,24 @@ arg = sys.argv[1].lower()
 target_file, target_name = TARGETS[arg]
 dest_path = "/mnt/d/"
 
+
 def copy_to_windows(src: str, filename: str):
     """Copy file from WSL to Windows D: drive using PowerShell."""
+    # Convert WSL path to Windows path for PowerShell
+    result = subprocess.run(
+        ["wslpath", "-w", src],
+        capture_output=True, text=True, check=True
+    )
+    src_win = result.stdout.strip()
     dest_win = f"D:\\{filename}"
     cmd = [
-        "powershell.exe", "-Command",
-        f'Copy-Item -Path "{src}" -Destination "{dest_win}" -Force'
+        "powershell.exe",
+        "-Command",
+        f'Copy-Item -Path "{src_win}" -Destination "{dest_win}" -Force',
     ]
     subprocess.run(cmd, check=True)
     print(f"Copied to {dest_win}")
+
 
 # Check gh CLI is available
 try:
@@ -40,7 +49,9 @@ except (subprocess.CalledProcessError, FileNotFoundError):
 try:
     result = subprocess.run(
         ["git", "remote", "get-url", "origin"],
-        capture_output=True, text=True, check=True
+        capture_output=True,
+        text=True,
+        check=True,
     )
     remote_url = result.stdout.strip()
     # Parse github.com/owner/repo.git or https://github.com/owner/repo
@@ -68,9 +79,22 @@ print(f"Target: {target_name} ({target_file})")
 print("Finding latest workflow run...")
 try:
     result = subprocess.run(
-        ["gh", "run", "list", "--repo", f"{owner}/{repo}",
-         "--workflow", "build.yml", "--limit", "1", "--json", "databaseId,status,conclusion"],
-        capture_output=True, text=True, check=True
+        [
+            "gh",
+            "run",
+            "list",
+            "--repo",
+            f"{owner}/{repo}",
+            "--workflow",
+            "build.yml",
+            "--limit",
+            "1",
+            "--json",
+            "databaseId,status,conclusion",
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
     )
     runs = json.loads(result.stdout)
     if not runs:
@@ -92,14 +116,25 @@ except Exception as e:
 
 # Download artifact to temp dir
 tmp_dir = tempfile.mkdtemp(prefix="roki_")
-artifact_name = f"{repo}-firmware_uf2"  # default naming from RMK workflow
+artifact_name = "RoKi-firmware_uf2"  # default naming from RMK workflow
 
 print(f"Downloading artifact '{artifact_name}'...")
 try:
     subprocess.run(
-        ["gh", "run", "download", str(run_id), "--repo", f"{owner}/{repo}",
-         "--name", artifact_name, "--dir", tmp_dir],
-        check=True, capture_output=False
+        [
+            "gh",
+            "run",
+            "download",
+            str(run_id),
+            "--repo",
+            f"{owner}/{repo}",
+            "--name",
+            artifact_name,
+            "--dir",
+            tmp_dir,
+        ],
+        check=True,
+        capture_output=False,
     )
 except subprocess.CalledProcessError as e:
     print(f"ERROR: Failed to download artifact: {e}")
@@ -107,8 +142,19 @@ except subprocess.CalledProcessError as e:
     print("Available artifacts in latest run:")
     try:
         result = subprocess.run(
-            ["gh", "run", "view", str(run_id), "--repo", f"{owner}/{repo}", "--json", "artifacts"],
-            capture_output=True, text=True, check=True
+            [
+                "gh",
+                "run",
+                "view",
+                str(run_id),
+                "--repo",
+                f"{owner}/{repo}",
+                "--json",
+                "artifacts",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
         )
         data = json.loads(result.stdout)
         for art in data.get("artifacts", []):
@@ -173,4 +219,5 @@ except OSError as e:
 finally:
     # Cleanup temp dir
     import shutil
+
     shutil.rmtree(tmp_dir, ignore_errors=True)
