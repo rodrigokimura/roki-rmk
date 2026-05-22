@@ -62,7 +62,6 @@ row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_02", "P1_15", "P1_13", "P1_11", "P0_10", "P0_09"]
 
-
 [[split.peripheral]]
 rows = 5
 cols = 6
@@ -75,7 +74,7 @@ row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
 
 # Encoder on the left half (central)
-[[input_device.encoder]]
+[[split.central.input_device.encoder]]
 pin_a = "P0_17"
 pin_b = "P0_20"
 phase = "resolution"
@@ -84,7 +83,7 @@ reverse = false
 internal_pullup = true
 
 # Encoder on the right half (peripheral) — same PCB, same pins
-[[input_device.encoder]]
+[[split.peripheral.input_device.encoder]]
 pin_a = "P0_17"
 pin_b = "P0_20"
 phase = "resolution"
@@ -92,7 +91,7 @@ resolution = 4
 reverse = false
 internal_pullup = true
 
-[[input_device.joystick]]
+[[split.central.input_device.joystick]]
 name = "default"
 pin_x = "P0_31"
 pin_y = "P0_29"
@@ -101,7 +100,7 @@ transform = [[80, 0], [0, 80]]
 bias = [29130, 29365]
 resolution = 6
 
-[[input_device.joystick]]
+[[split.peripheral.input_device.joystick]]
 name = "default"
 pin_x = "P0_31"
 pin_y = "P0_29"
