@@ -73,11 +73,11 @@ direct_pins = []
 
 [[split.central.input_device.joystick]]
 name = "dstick"
-pin_x = "P0_31"
-pin_y = "P0_29"
-pin_z = "_"
-transform = [[0, 0], [0, 0]]
-bias = [0, 0]
+pin_x = "_"
+pin_y = "_"
+pin_z = "P0_31"
+transform = [[1]]
+bias = [0]
 resolution = 1
 
 [[split.peripheral]]
