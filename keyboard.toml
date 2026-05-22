@@ -60,7 +60,7 @@ col_offset = 0
 
 [split.central.matrix]
 matrix_type = "direct_pin"
-direct_pins = [[]]
+direct_pins = []
 
 [[split.peripheral]]
 rows = 5
