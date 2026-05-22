@@ -20,34 +20,8 @@ matrix_map = """
 (3, 0, L) (3, 1, L) (3, 2, L) (3, 3, L) (3, 4, L) (3, 5, L)    (3, 6, R) (3, 7, R) (3, 8, R) (3, 9, R) (3, 10, R) (3, 11, R)
 (4, 0, L) (4, 1, L) (4, 2, L) (4, 3, L) (4, 4, L) (4, 5, L)    (4, 6, R) (4, 7, R) (4, 8, R) (4, 9, R) (4, 10, R) (4, 11, R)
 """
-# keymap = [
-#     [
-#         ["Escape", "Kc1", "Kc2", "Kc3", "Kc4", "Kc5"],
-#         ["Tab", "Q", "W", "E", "R", "T"],
-#         ["LShift", "A", "S", "D", "F", "G"],
-#         ["MO(1)", "Z", "X", "C", "V", "B"],
-#         ["LCtrl", "LGui", "LAlt", "Space", "Enter", "No"],
-#         ["Kc6", "Kc7", "Kc8", "Kc9", "Kc0", "Escape"],
-#         ["Y", "U", "I", "O", "P", "Grave"],
-#         ["H", "J", "K", "L", "Slash", "RShift"],
-#         ["N", "M", "Comma", "Dot", "Backslash", "MO(1)"],
-#         ["No", "Backspace", "Space", "RAlt", "RGui", "RCtrl"]
-#     ],
-#     [
-#         ["F1", "F2", "F3", "F4", "F5", "F6"],
-#         ["No", "No ", "No", "No", "No", "No"],
-#         ["LShift", "Quote", "No", "No", "No", "No"],
-#         ["MO(1)", "No", "No", "Semicolon", "No", "No"],
-#         ["LCtrl", "LGui", "LAlt", "No", "No", "No"],
-#         ["F7", "F8", "F9", "F10", "F11", "F12"],
-#         ["MouseLeft", "MouseDown", "MouseUp", "MouseRight", "MediaPlayPause", "AudioVolUp"],
-#         ["Left", "Down", "Up", "Right", "No", "AudioVolDown"],
-#         ["Minus", "Equal", "LeftBracket", "No", "No", "MO(1)"],
-#         ["No", "Delete", "No", "RAlt", "RGui", "RCtrl"]
-#     ]
-# ]
 
-[[layer]]  # Layer 0
+[[layer]] # Layer 0
 keys = """
            Escape Kc1   Kc2   Kc3   Kc4   Kc5   Kc6 Kc7       Kc8   Kc9   Kc0       Escape
            Tab    Q     W     E     R     T     Y   U         I     O     P         Grave
@@ -55,9 +29,9 @@ keys = """
            MO(1)  Z     X     C     V     B     N   M         Comma Dot   Backslash MO(1)
            LCtrl  LGui  LAlt  Space Enter No    No  Backspace Space RAlt  RGui      RCtrl
 """
-encoders  = [["AudioVolUp",  "AudioVolDown"], ["AudioVolUp", "AudioVolDown"]]
+encoders = [["AudioVolUp", "AudioVolDown"], ["AudioVolUp", "AudioVolDown"]]
 
-[[layer]]  # Layer 1
+[[layer]] # Layer 1
 keys = """
          F1 F2 F3 F4 F5 F6      F7 F8 F9 F10 F11 F12
          User5 User0  User1 User2 _ _     MouseLeft MouseDown MouseUp MouseRight MediaPlayPause AudioVolUp
@@ -65,7 +39,7 @@ keys = """
          MO(1) _ _ Semicolon _ _  Minus Equal LeftBracket _ _ MO(1)
          LCtrl LGui LAlt _ _ _     _ Delete _ RAlt RGui RCtrl
 """
-encoders  = [["Up", "Down"], ["Up", "Down"]]
+encoders = [["Up", "Down"], ["Up", "Down"]]
 
 [ble]
 enabled = true
@@ -107,6 +81,7 @@ pin_b = "P0_20"
 phase = "resolution"
 resolution = 4
 reverse = false
+internal_pullup = true
 
 # Encoder on the right half (peripheral) — same PCB, same pins
 [[input_device.encoder]]
@@ -115,6 +90,7 @@ pin_b = "P0_20"
 phase = "resolution"
 resolution = 4
 reverse = false
+internal_pullup = true
 
 # [[split.central.output]]
 # pin = "P0_13"
@@ -123,4 +99,3 @@ reverse = false
 # [[split.peripheral.output]]
 # pin = "P0_13"
 # initial_state_active = false
-
