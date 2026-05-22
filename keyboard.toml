@@ -87,11 +87,11 @@ pin_a = "P0_17"
 pin_b = "P0_20"
 phase = "resolution"
 resolution = 2
-reverse = false
+reverse = true
 internal_pullup = true
 
 [[split.peripheral.input_device.joystick]]
-name = "default"
+name = "lstick"
 pin_x = "P0_31"
 pin_y = "P0_29"
 pin_z = "_"
@@ -116,11 +116,11 @@ pin_a = "P0_17"
 pin_b = "P0_20"
 phase = "resolution"
 resolution = 2
-reverse = false
+reverse = true
 internal_pullup = true
 
 [[split.peripheral.input_device.joystick]]
-name = "default"
+name = "rstick"
 pin_x = "P0_31"
 pin_y = "P0_29"
 pin_z = "_"
