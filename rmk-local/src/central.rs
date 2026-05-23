@@ -65,6 +65,9 @@ const L2CAP_RXQ: u8 = 3;
 /// Size of L2CAP packets
 const L2CAP_MTU: usize = 251;
 
+/// Dead-zone threshold in raw ADC units. Tune by observing `record = [x, y]` debug output.
+const JOYSTICK_DEAD_ZONE: i16 = 300;
+
 fn build_sdc<'d, const N: usize>(
     p: nrf_sdc::Peripherals<'d>,
     rng: &'d mut rng::Rng<Async>,
@@ -216,7 +219,7 @@ async fn main(spawner: Spawner) {
 
     // === JOYSTICK FIX: create JoystickProcessors on the central ===
     let mut joystick_l = JoystickProcessor::<ROW, COL, NUM_LAYER, NUM_ENCODER, 2>::new(
-        [[80, 0], [0, 80]], [29130, 29365], 6, &keymap,
+        [[150, 0], [0, 150]], [29000, 29000], 4, &keymap,
     );
 
     // Run everything
@@ -276,6 +279,23 @@ async fn main(spawner: Spawner) {
                                 current_event = next_event;
                             }
                         }
+
+                        // === DEAD ZONE FILTER ===
+                        let current_event = match current_event {
+                            rmk::event::Event::Joystick(mut axes) => {
+                                // Circular dead zone: zero out both axes if combined magnitude is small
+                                let x = axes[0].value as i32;
+                                let y = axes[1].value as i32;
+                                let dist_sq = x * x + y * y;
+                                let dead_sq = (JOYSTICK_DEAD_ZONE as i32) * (JOYSTICK_DEAD_ZONE as i32);
+                                if dist_sq < dead_sq {
+                                    axes[0].value = 0;
+                                    axes[1].value = 0;
+                                }
+                                rmk::event::Event::Joystick(axes)
+                            }
+                            other => other,
+                        };
 
                         // Joystick processor (THE FIX)
                         match joystick_l.process(current_event).await {
