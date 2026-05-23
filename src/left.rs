@@ -11,8 +11,6 @@ mod saadc_irq {
 
 #[rmk_peripheral(id = 0)]
 mod keyboard_peripheral {
-    use embassy_nrf::saadc::Input as _;
-    use rmk::controller::PollingController;
 
     #[controller(event)]
     fn buzzer_controller() {
