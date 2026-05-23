@@ -1,25 +1,6 @@
-# RoKi — RMK Firmware (Local Build)
+# RoKi — RMK Firmware
 
-Firmware for the RoKi split ergonomic keyboard, built locally with Rust + RMK.
-
-## Build
-
-```bash
-cd rmk-local
-RUST_MIN_STACK=67108864 cargo build --release
-cargo make uf2 --release
-```
-
-Outputs:
-- `RoKi-central.uf2` → dongle (USB/BLE central)
-- `RoKi-left.uf2` → left half
-- `RoKi-right.uf2` → right half
-
-## Flash
-
-1. **Dongle** — double-tap reset → drag `RoKi-central.uf2` onto `NRF52BOOT`
-2. **Left half** — double-tap reset → drag `RoKi-left.uf2`
-3. **Right half** — double-tap reset → drag `RoKi-right.uf2`
+Hand-written firmware for the RoKi split ergonomic keyboard.
 
 ## Hardware
 
@@ -29,21 +10,51 @@ Outputs:
 - **Joysticks**: 1 per half (P0.31 X / P0.29 Y), 45° per-side rotation
 - **Buzzer**: piezo on P0.06 per half, R2-D2 connect/disconnect sounds
 
-## Project Layout
+## File layout
 
+| File | Role |
+|------|------|
+| `src/central.rs` | Dongle: BLE central, battery processor, pass-through joystick processor |
+| `src/keymap.rs` | Hardcoded keymap, encoder map, VIAL config |
+| `src/left.rs` | Left half: matrix, encoder, joystick ADC reader (CCW 45°), buzzer |
+| `src/right.rs` | Right half: same with joystick CW 45° rotation |
+| `keyboard.toml` | Hardware config (pins, matrix, split layout) |
+| `vial.json` | Vial GUI layout descriptor |
+
+## Build
+
+```bash
+RUST_MIN_STACK=67108864 cargo build --release
+cargo make uf2 --release
 ```
-├── keyboard.toml          # Hardware + keymap configuration
-├── vial.json              # Vial layout descriptor
-└── rmk-local/             # Local Rust firmware
-    ├── src/
-    │   ├── central.rs     # Dongle: BLE central, joystick processor
-    │   ├── left.rs      # Left half: matrix, encoder, joystick, buzzer
-    │   ├── right.rs     # Right half: same with CW joystick rotation
-    │   └── keymap.rs      # Hardcoded keymap + VIAL config
-    ├── keyboard.toml      # Synced copy from repo root
-    ├── vial.json          # Synced copy from repo root
-    └── Cargo.toml         # Dependencies + feature flags
+
+Outputs:
+- `RoKi-central.uf2` → dongle
+- `RoKi-left.uf2` → left half
+- `RoKi-right.uf2` → right half
+
+## Flash
+
+1. **Dongle** — double-tap reset → drag `RoKi-central.uf2` onto `NRF52BOOT`
+2. **Left half** — double-tap reset → drag `RoKi-left.uf2`
+3. **Right half** — double-tap reset → drag `RoKi-right.uf2`
+
+## Calibrating joysticks
+
+Watch raw ADC values with a debug probe, then tune in `src/left.rs` / `src/right.rs`:
+
+```rust
+const CENTER_X: i32 = 7500;  // resting ADC value
+const CENTER_Y: i32 = 7500;
+const SCALE: i32 = 64;       // sensitivity
+const DEAD_ZONE: i32 = 4;    // raw mouse units
 ```
+
+## Updating after keyboard.toml changes
+
+Edit `keyboard.toml` directly at the repo root, then rebuild.
+
+If keymap or encoder map changed, also edit `src/keymap.rs` manually (hardcoded Rust arrays extracted from macro expansion).
 
 ## Key features
 
@@ -54,24 +65,6 @@ Outputs:
 | Dead zone | Circular dead zone in per-half joystick readers |
 | Buzzer | `#[controller(event)]` on each half, R2-D2 tones on connect/disconnect |
 | Battery | `BatteryProcessor` on central, VDDH ADC |
-
-## Calibrating joysticks
-
-Watch raw ADC values with a debug probe, then tune in `left.rs` / `right.rs`:
-
-```rust
-const CENTER_X: i32 = 7500;  // resting ADC value
-const CENTER_Y: i32 = 7500;
-const SCALE: i32 = 64;       // sensitivity
-const DEAD_ZONE: i32 = 4;    // raw mouse units
-```
-
-## Updating after `keyboard.toml` changes
-
-1. Edit `keyboard.toml` at repo root
-2. `cp ../keyboard.toml ../vial.json .` (in `rmk-local/`)
-3. If keymap changed: manually update `src/keymap.rs` (hardcoded arrays)
-4. Rebuild & reflash all three binaries
 
 ## References
 
