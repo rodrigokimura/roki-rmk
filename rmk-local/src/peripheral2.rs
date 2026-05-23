@@ -17,15 +17,23 @@ mod keyboard_peripheral {
             async fn process_event(&mut self, event: Self::Event) {
                 if let rmk::event::ControllerEvent::SplitCentral(connected) = event {
                     if connected {
-                        // === CONNECTED tone: rising, cheerful ===
-                        self.beep(1500, 80).await;
-                        embassy_time::Timer::after_millis(40).await;
-                        self.beep(2000, 120).await;
+                        // === R2-D2 happy chirp ===
+                        self.beep(2000, 30).await;
+                        embassy_time::Timer::after_millis(10).await;
+                        self.beep(2600, 40).await;
+                        embassy_time::Timer::after_millis(10).await;
+                        self.beep(3200, 50).await;
+                        embassy_time::Timer::after_millis(15).await;
+                        self.beep(2400, 60).await;
                     } else {
-                        // === DISCONNECTED tone: falling, sad ===
-                        self.beep(2000, 80).await;
-                        embassy_time::Timer::after_millis(40).await;
-                        self.beep(1200, 200).await;
+                        // === R2-D2 sad whistle ===
+                        self.beep(3000, 50).await;
+                        embassy_time::Timer::after_millis(15).await;
+                        self.beep(2200, 70).await;
+                        embassy_time::Timer::after_millis(15).await;
+                        self.beep(1600, 90).await;
+                        embassy_time::Timer::after_millis(20).await;
+                        self.beep(1000, 120).await;
                     }
                 }
             }
