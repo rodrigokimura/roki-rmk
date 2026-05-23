@@ -7,7 +7,8 @@ manufacturer = "RoKi"
 chip = "nrf52840"
 
 [rmk]
-ble_profiles_num = 3
+ble_profiles_num = 1
+split_peripherals_num = 2
 
 [layout]
 rows = 5
@@ -18,33 +19,39 @@ matrix_map = """
 (1, 0, L) (1, 1, L) (1, 2, L) (1, 3, L) (1, 4, L) (1, 5, L)    (1, 6, R) (1, 7, R) (1, 8, R) (1, 9, R) (1, 10, R) (1, 11, R)
 (2, 0, L) (2, 1, L) (2, 2, L) (2, 3, L) (2, 4, L) (2, 5, L)    (2, 6, R) (2, 7, R) (2, 8, R) (2, 9, R) (2, 10, R) (2, 11, R)
 (3, 0, L) (3, 1, L) (3, 2, L) (3, 3, L) (3, 4, L) (3, 5, L)    (3, 6, R) (3, 7, R) (3, 8, R) (3, 9, R) (3, 10, R) (3, 11, R)
+
 (4, 0, L) (4, 1, L) (4, 2, L) (4, 3, L) (4, 4, L) (4, 5, L)    (4, 6, R) (4, 7, R) (4, 8, R) (4, 9, R) (4, 10, R) (4, 11, R)
 """
 
 [[layer]] # Layer 0
 keys = """
-           Escape Kc1   Kc2   Kc3   Kc4   Kc5   Kc6 Kc7       Kc8   Kc9   Kc0       Escape
-           Tab    Q     W     E     R     T     Y   U         I     O     P         Grave
-           LShift A     S     D     F     G     H   J         K     L     Slash     RShift
-           MO(1)  Z     X     C     V     B     N   M         Comma Dot   Backslash MO(1)
-           LCtrl  LGui  LAlt  Space Enter No    No  Backspace Space RAlt  RGui      RCtrl
+
+esc    1     2     3     4     5                                6     7     8     9     0       esc
+Tab    Q     W     E     R     T                                Y     U     I     O     P       Grave
+lsft   A     S     D     F     G                                H     J     K     L     slsh    rsft
+MO(1)  Z     X     C     V     B                                N     M     comm  .     bsls    MO(1)
+
+          lctl   lwin  LAlt  spc   ent   No       No    bspc  spc   RAlt  rwin    rctl
+
 """
-encoders = [["AudioVolUp", "AudioVolDown"], ["AudioVolUp", "AudioVolDown"]]
+encoders = [["AudioVolDown", "AudioVolUp"], ["AudioVolDown", "AudioVolUp"]]
 
 [[layer]] # Layer 1
 keys = """
-         F1 F2 F3 F4 F5 F6      F7 F8 F9 F10 F11 F12
-         User5 User0  User1 User2 _ _     MouseLeft MouseDown MouseUp MouseRight MediaPlayPause AudioVolUp
-         LShift Quote _ _ _ _     Left Down Up Right _ AudioVolDown
-         MO(1) _ _ Semicolon _ _  Minus Equal LeftBracket _ _ MO(1)
-         LCtrl LGui LAlt _ _ _     _ Delete _ RAlt RGui RCtrl
+
+F1 F2 F3 F4 F5 F6      F7 F8 F9 F10 F11 F12
+_ _  _ _ _ _     MouseLeft MouseDown MouseUp MouseRight MediaPlayPause AudioVolUp
+lsft Quote _ _ _ _     Left Down Up Right _ AudioVolDown
+MO(1) _ _ Semicolon _ _  Minus Equal LeftBracket _ _ MO(1)
+
+LCtrl LGui LAlt _ _ _     _ Delete _ RAlt RGui RCtrl
+
 """
-encoders = [["Up", "Down"], ["Up", "Down"]]
+encoders = [["Down", "Up"], ["Down", "Up"]]
 
 [ble]
 enabled = true
 default_tx_power = 8
-battery_adc_pin = "vddh"
 
 [storage]
 enabled = true
@@ -53,67 +60,50 @@ enabled = true
 connection = "ble"
 
 [split.central]
+rows = 0
+cols = 0
+row_offset = 0
+col_offset = 0
+ble_addr = [0xde, 0x21, 0x8e, 0xc7, 0x2e, 0xce]
+
+[split.central.matrix]
+matrix_type = "direct_pin"
+direct_pins = []
+
+[[split.peripheral]]
 rows = 5
 cols = 6
 row_offset = 0
 col_offset = 0
-
-[split.central.matrix]
+ble_addr = [0x44, 0x3e, 0x55, 0x00, 0x61, 0xd7]
+[split.peripheral.matrix]
 row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_02", "P1_15", "P1_13", "P1_11", "P0_10", "P0_09"]
+
+[[split.peripheral.input_device.encoder]]
+pin_a = "P0_17"
+pin_b = "P0_20"
+phase = "resolution"
+resolution = 2
+reverse = true
+internal_pullup = true
 
 [[split.peripheral]]
 rows = 5
 cols = 6
 row_offset = 0
 col_offset = 6
-
+ble_addr = [0x9f, 0xbb, 0xef, 0x6e, 0x95, 0xe3]
 [split.peripheral.matrix]
 row2col = true
 row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
 col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
 
-# Encoder on the left half (central)
-[[split.central.input_device.encoder]]
-pin_a = "P0_17"
-pin_b = "P0_20"
-phase = "resolution"
-resolution = 4
-reverse = false
-internal_pullup = true
-
-# Encoder on the right half (peripheral) — same PCB, same pins
 [[split.peripheral.input_device.encoder]]
 pin_a = "P0_17"
 pin_b = "P0_20"
 phase = "resolution"
-resolution = 4
-reverse = false
+resolution = 2
+reverse = true
 internal_pullup = true
-
-[[split.central.input_device.joystick]]
-name = "default"
-pin_x = "P0_31"
-pin_y = "P0_29"
-pin_z = "_"
-transform = [[80, 0], [0, 80]]
-bias = [29130, 29365]
-resolution = 6
-
-[[split.peripheral.input_device.joystick]]
-name = "default"
-pin_x = "P0_31"
-pin_y = "P0_29"
-pin_z = "_"
-transform = [[80, 0], [0, 80]]
-bias = [29130, 29365]
-resolution = 6
-
-# [[split.central.output]]
-# pin = "P0_13"
-# initial_state_active = false
-#
-# [[split.peripheral.output]]
-# pin = "P0_13"
-# initial_state_active = false
