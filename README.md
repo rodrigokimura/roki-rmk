@@ -12,14 +12,14 @@ cargo make uf2 --release
 
 Outputs:
 - `RoKi-central.uf2` → dongle (USB/BLE central)
-- `RoKi-peripheral.uf2` → left half
-- `RoKi-peripheral2.uf2` → right half
+- `RoKi-left.uf2` → left half
+- `RoKi-right.uf2` → right half
 
 ## Flash
 
 1. **Dongle** — double-tap reset → drag `RoKi-central.uf2` onto `NRF52BOOT`
-2. **Left half** — double-tap reset → drag `RoKi-peripheral.uf2`
-3. **Right half** — double-tap reset → drag `RoKi-peripheral2.uf2`
+2. **Left half** — double-tap reset → drag `RoKi-left.uf2`
+3. **Right half** — double-tap reset → drag `RoKi-right.uf2`
 
 ## Hardware
 
@@ -37,8 +37,8 @@ Outputs:
 └── rmk-local/             # Local Rust firmware
     ├── src/
     │   ├── central.rs     # Dongle: BLE central, joystick processor
-    │   ├── peripheral.rs  # Left half: matrix, encoder, joystick, buzzer
-    │   ├── peripheral2.rs # Right half: same with CW joystick rotation
+    │   ├── left.rs      # Left half: matrix, encoder, joystick, buzzer
+    │   ├── right.rs     # Right half: same with CW joystick rotation
     │   └── keymap.rs      # Hardcoded keymap + VIAL config
     ├── keyboard.toml      # Synced copy from repo root
     ├── vial.json          # Synced copy from repo root
@@ -51,13 +51,13 @@ Outputs:
 |---------|---------------|
 | BLE split | `rmk` built-in split peripheral/central |
 | Joystick → mouse | Custom `#[controller(poll)]` on each half, per-side 45° rotation |
-| Dead zone | Circular dead zone in peripheral joystick readers |
+| Dead zone | Circular dead zone in per-half joystick readers |
 | Buzzer | `#[controller(event)]` on each half, R2-D2 tones on connect/disconnect |
 | Battery | `BatteryProcessor` on central, VDDH ADC |
 
 ## Calibrating joysticks
 
-Watch raw ADC values with a debug probe, then tune in `peripheral.rs` / `peripheral2.rs`:
+Watch raw ADC values with a debug probe, then tune in `left.rs` / `right.rs`:
 
 ```rust
 const CENTER_X: i32 = 7500;  // resting ADC value

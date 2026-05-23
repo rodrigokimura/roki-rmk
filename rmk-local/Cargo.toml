@@ -68,8 +68,8 @@ name = "central"
 path = "src/central.rs"
 
 [[bin]]
-name = "peripheral"
-path = "src/peripheral.rs"
+name = "left"
+path = "src/left.rs"
 
 [profile.dev]
 codegen-units = 1      # better optimizations
@@ -87,5 +87,5 @@ overflow-checks = false
 lto = "fat"
 
 [[bin]]
-name = "peripheral2"
-path = "src/peripheral2.rs"
+name = "right"
+path = "src/right.rs"

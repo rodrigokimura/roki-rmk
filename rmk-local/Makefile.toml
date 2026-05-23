@@ -27,7 +27,7 @@ args = [
 ]
 dependencies = ["build"]
 
-[tasks.objcopy-peripheral]
+[tasks.objcopy-left]
 install_crate = { crate_name = "cargo-binutils", binary = "cargo", test_arg = [
     "objcopy",
     "--help",
@@ -37,11 +37,11 @@ args = [
     "objcopy",
     "--release",
     "--bin",
-    "peripheral",
+    "left",
     "--",
     "-O",
     "ihex",
-    "RoKi-peripheral.hex",
+    "RoKi-left.hex",
 ]
 dependencies = ["build"]
 
@@ -62,7 +62,7 @@ args = [
 ]
 dependencies = ["objcopy-central"]
 
-[tasks.uf2-peripheral]
+[tasks.uf2-left]
 install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = [
     "hex-to-uf2",
     "--help",
@@ -71,18 +71,18 @@ command = "cargo"
 args = [
     "hex-to-uf2",
     "--input-path",
-    "RoKi-peripheral.hex",
+    "RoKi-left.hex",
     "--output-path",
-    "RoKi-peripheral.uf2",
+    "RoKi-left.uf2",
     "--family",
     "nrf52840",
 ]
-dependencies = ["objcopy-peripheral"]
+dependencies = ["objcopy-left"]
 
 [tasks.uf2]
-dependencies = ["uf2-central", "uf2-peripheral", "uf2-peripheral2"]
+dependencies = ["uf2-central", "uf2-left", "uf2-right"]
 
-[tasks.objcopy-peripheral2]
+[tasks.objcopy-right]
 install_crate = { crate_name = "cargo-binutils", binary = "cargo", test_arg = [
   "objcopy",
   "--help",
@@ -92,15 +92,15 @@ args = [
   "objcopy",
   "--release",
   "--bin",
-  "peripheral2",
+  "right",
   "--",
   "-O",
   "ihex",
-  "RoKi-peripheral2.hex",
+  "RoKi-right.hex",
 ]
 dependencies = ["build"]
 
-[tasks.uf2-peripheral2]
+[tasks.uf2-right]
 install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = [
   "hex-to-uf2",
   "--help",
@@ -109,10 +109,10 @@ command = "cargo"
 args = [
   "hex-to-uf2",
   "--input-path",
-  "RoKi-peripheral2.hex",
+  "RoKi-right.hex",
   "--output-path",
-  "RoKi-peripheral2.uf2",
+  "RoKi-right.uf2",
   "--family",
   "nrf52840",
 ]
-dependencies = ["objcopy-peripheral2"]
+dependencies = ["objcopy-right"]

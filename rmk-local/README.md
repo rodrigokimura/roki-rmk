@@ -8,8 +8,8 @@ Hand-written RMK firmware for the RoKi split keyboard. All logic is in the Rust 
 |------|------|
 | `src/central.rs` | Dongle: BLE central, battery processor, pass-through joystick processor |
 | `src/keymap.rs` | Hardcoded keymap, encoder map, VIAL config |
-| `src/peripheral.rs` | Left half: matrix, encoder, joystick ADC reader (CCW 45°), buzzer |
-| `src/peripheral2.rs` | Right half: same with joystick CW 45° rotation |
+| `src/left.rs` | Left half: matrix, encoder, joystick ADC reader (CCW 45°), buzzer |
+| `src/right.rs` | Right half: same with joystick CW 45° rotation |
 | `keyboard.toml` | Copied from repo root (pin config for macro expansion) |
 | `vial.json` | Copied from repo root |
 
