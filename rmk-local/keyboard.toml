@@ -95,8 +95,8 @@ name = "lstick"
 pin_x = "P0_31"
 pin_y = "P0_29"
 pin_z = "_"
-transform = [[80, 0], [0, 80]]
-bias = [29130, 29365]
+transform = [[150, 0], [0, 150]]
+bias = [29000, 29000]
 resolution = 6
 
 
@@ -124,6 +124,6 @@ name = "rstick"
 pin_x = "P0_31"
 pin_y = "P0_29"
 pin_z = "_"
-transform = [[80, 0], [0, 80]]
-bias = [29130, 29365]
+transform = [[150, 0], [0, 150]]
+bias = [29000, 29000]
 resolution = 6
