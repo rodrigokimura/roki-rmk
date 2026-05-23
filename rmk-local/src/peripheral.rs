@@ -26,16 +26,6 @@ mod keyboard_peripheral {
             async fn process_event(&mut self, event: Self::Event) {
                 if let rmk::event::ControllerEvent::SplitCentral(connected) = event {
                     if connected {
-                        // === R2-D2 happy chirp ===
-                        self.beep(2000, 30).await;
-                        embassy_time::Timer::after_millis(10).await;
-                        self.beep(2600, 40).await;
-                        embassy_time::Timer::after_millis(10).await;
-                        self.beep(3200, 50).await;
-                        embassy_time::Timer::after_millis(15).await;
-                        self.beep(2400, 60).await;
-                    } else {
-                        // === R2-D2 sad whistle ===
                         self.beep(3000, 50).await;
                         embassy_time::Timer::after_millis(15).await;
                         self.beep(2200, 70).await;
@@ -43,6 +33,14 @@ mod keyboard_peripheral {
                         self.beep(1600, 90).await;
                         embassy_time::Timer::after_millis(20).await;
                         self.beep(1000, 120).await;
+                    } else {
+                        self.beep(2000, 30).await;
+                        embassy_time::Timer::after_millis(10).await;
+                        self.beep(2600, 40).await;
+                        embassy_time::Timer::after_millis(10).await;
+                        self.beep(3200, 50).await;
+                        embassy_time::Timer::after_millis(15).await;
+                        self.beep(2400, 60).await;
                     }
                 }
             }
@@ -109,9 +107,9 @@ mod keyboard_peripheral {
                 let raw_y = buf[1] as i32;
 
                 // Tune these by observing raw values at rest
-                const CENTER_X: i32 = 7500;
-                const CENTER_Y: i32 = 7500;
-                const SCALE: i32 = 64;
+                const CENTER_X: i32 = 1900;
+                const CENTER_Y: i32 = 1900;
+                const SCALE: i32 = 128;
 
                 let x = raw_x - CENTER_X;
                 let y = raw_y - CENTER_Y;
@@ -127,7 +125,7 @@ mod keyboard_peripheral {
                 let x_mouse = (x_rot / SCALE).clamp(-127, 127) as i16;
                 let y_mouse = (y_rot / SCALE).clamp(-127, 127) as i16;
 
-                const DEAD_ZONE: i32 = 4;
+                const DEAD_ZONE: i32 = 1;
                 let dist_sq = (x_mouse as i32).pow(2) + (y_mouse as i32).pow(2);
                 let (x_final, y_final) = if dist_sq < DEAD_ZONE * DEAD_ZONE {
                     (0i16, 0i16)
