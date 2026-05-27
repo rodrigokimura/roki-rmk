@@ -88,3 +88,7 @@ lto = "fat"
 [[bin]]
 name = "right"
 path = "src/right.rs"
+
+[[bin]]
+name = "trackball"
+path = "src/trackball.rs"

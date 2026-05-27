@@ -107,3 +107,13 @@ phase = "resolution"
 resolution = 2
 reverse = true
 internal_pullup = true
+
+[[split.peripheral]]
+rows = 0
+cols = 0
+row_offset = 0
+col_offset = 0
+ble_addr = [0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc]
+[split.peripheral.matrix]
+matrix_type = "direct_pin"
+direct_pins = []

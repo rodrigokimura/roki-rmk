@@ -212,7 +212,7 @@ async fn main(spawner: Spawner) {
 
     // Peripheral addresses from storage
     let peripheral_addrs = rmk::split::ble::central::read_peripheral_addresses::<
-        2, _, ROW, COL, NUM_LAYER, NUM_ENCODER,
+        3, _, ROW, COL, NUM_LAYER, NUM_ENCODER,
     >(&mut storage)
     .await;
 
@@ -292,7 +292,10 @@ async fn main(spawner: Spawner) {
             scan_peripherals(&stack, &peripheral_addrs),
             join(
                 run_peripheral_manager::<5, 6, 0, 0, _>(0, &peripheral_addrs, &stack),
-                run_peripheral_manager::<5, 6, 0, 6, _>(1, &peripheral_addrs, &stack),
+                join(
+                    run_peripheral_manager::<5, 6, 0, 6, _>(1, &peripheral_addrs, &stack),
+                    run_peripheral_manager::<0, 0, 0, 0, _>(2, &peripheral_addrs, &stack),
+                ),
             ),
         ),
     )
