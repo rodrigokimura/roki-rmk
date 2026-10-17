@@ -1,13 +1,13 @@
 [package]
-name = "RoKi"
+name = "roki"
 version = "0.2.0"
-authors = ["Haobo Gu <haobogu@outlook.com>"]
-description = "Keyboard firmware written in Rust"
-homepage = "https://github.com/rmk-rs/rmk"
-repository = "https://github.com/rmk-rs/rmk"
+authors = ["Rodrigo Eiti Kimura <rodrigoeitikimura@gmail.com>"]
+description = "RMK firmware for the RoKi split ergonomic keyboard (nice!nano v2 halves + USB dongle)"
+repository = "https://github.com/rodrigokimura/roki-rmk"
 readme = "README.md"
 edition = "2024"
 license = "MIT OR Apache-2.0"
+publish = false
 
 [dependencies]
 # `dongle` is enabled on every binary: on the keyboard (central) it adds the
