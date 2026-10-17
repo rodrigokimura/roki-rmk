@@ -125,7 +125,7 @@ mod keyboard_peripheral {
                 let x_mouse = (x_rot / SCALE).clamp(-127, 127) as i16;
                 let y_mouse = (y_rot / SCALE).clamp(-127, 127) as i16;
 
-                const DEAD_ZONE: i32 = 1;
+                const DEAD_ZONE: i32 = 2;
                 let dist_sq = (x_mouse as i32).pow(2) + (y_mouse as i32).pow(2);
                 let (x_final, y_final) = if dist_sq < DEAD_ZONE * DEAD_ZONE {
                     (0i16, 0i16)
