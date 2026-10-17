@@ -9,7 +9,9 @@ Hand-written firmware for the RoKi split ergonomic keyboard, built on
  ┌────────────┐  BLE split   ┌────────────┐  BLE (dongle slot)  ┌──────────┐  USB  ┌──────┐
  │ right half │ ───────────▶ │ left half  │ ──────────────────▶ │  dongle  │ ────▶ │ host │
  │ peripheral │              │  central   │ ──┐                 └──────────┘       └──────┘
- └────────────┘              └────────────┘   │ BLE profile 0 (direct, optional)
+ └────────────┘              └────────────┘   │ BLE profiles 0–2 (direct)
+                                              ├─────────────────────────────────▶ hosts
+                                              │ USB (when a cable is plugged in)
                                               └─────────────────────────────────▶ host
 ```
 
@@ -21,12 +23,15 @@ Hand-written firmware for the RoKi split ergonomic keyboard, built on
 
 ## Hardware
 
-- **Controller**: nice!nano v2 (nRF52840) ×3
-- **Matrix**: 5×6 per half, row2col
-- **Encoders**: 1 per half (P0.17 / P0.20)
-- **Joysticks**: 1 per half (P0.31 X / P0.29 Y), 45° per-side rotation
-- **Buzzer**: piezo on P0.06 per half, R2-D2 connect/disconnect sounds
-- **Battery**: VDDH/5 via SAADC on each half
+Three nice!nano v2 (nRF52840) boards. Each **half** has:
+
+- **Matrix**: 5×6, row2col (rows `P0.24 P1.00 P0.11 P1.04 P1.06`; columns differ per side, see `keyboard.toml`)
+- **Encoder**: `P0.17` / `P0.20`, internal pull-up, resolution 2
+- **Joystick**: `P0.31` X / `P0.29` Y, rotated 45° (left CCW, right CW)
+- **Buzzer**: piezo on `P0.06`, R2-D2 connect/disconnect chirps
+- **Battery**: VDDH/5 via SAADC (sampled every 30 s)
+
+The **dongle** is a bare nice!nano on USB — no matrix, no peripherals.
 
 ## File layout
 
@@ -39,8 +44,9 @@ Hand-written firmware for the RoKi split ergonomic keyboard, built on
 | `src/keymap.rs`  | Keymap, encoder map, Vial config (kept in sync with `keyboard.toml`) |
 | `src/fmt.rs`     | Logging shim (`defmt` by default, `log` over USB with `--features usb_log`) + crash recorder |
 | `keyboard.toml`  | Layout/keymap/pins; read at build time for RMK constants |
-| `vial.json`      | Vial GUI layout descriptor |
-| `vial_config.json` | Vial keymap export matching the firmware defaults (load it in Vial after a storage reset) |
+| `vial.json`      | Vial keyboard definition (compressed into the firmware by `build.rs`) |
+| `keyboard-layout.json` | KLE source for the `vial.json` layout |
+| `vial_config.json` | Vial `.vil` export matching the firmware defaults (load it in Vial after a storage reset) |
 
 ## Prerequisites
 
@@ -62,6 +68,10 @@ Outputs: `RoKi-left.uf2`, `RoKi-right.uf2`, `RoKi-dongle.uf2`.
 ## Flash
 
 Double-tap reset on each nice!nano → drag the matching `.uf2` onto the `NICENANO` drive.
+The red LED blinks while the board is in the bootloader.
+
+The halves pair with each other automatically on first boot (no `ble_addr`
+needed); the buzzer chirps on both sides when the split link is up.
 
 ## Pairing the dongle
 
@@ -76,7 +86,7 @@ Double-tap reset on each nice!nano → drag the matching `.uf2` onto the `NICENA
 
 **Hold the dongle key for 5 s** to clear the keyboard's dongle bond and seek a new dongle.
 
-### Switching between dongle and direct BLE
+## Switching between dongle and direct BLE
 
 Three BLE profiles plus the dongle slot. On layer 1 (`MO(1)`), thumb row:
 
@@ -91,7 +101,11 @@ Three BLE profiles plus the dongle slot. On layer 1 (`MO(1)`), thumb row:
 Each slot keeps its own bond, so switching never requires re-pairing. USB
 always wins when a cable is plugged in.
 
-The split halves find each other on their own (no `ble_addr` needed).
+RMK derives these keycodes from `ble_profiles_num` (N = 3): `User(0..N-1)`
+select a profile, then `User(N)` next, `User(N+1)` previous, `User(N+2)` clear
+current bond, `User(N+3)` toggle USB/BLE preference, `User(N+4)` clear the
+split peer, `User(N+5)` switch to dongle. In Vial they appear as `USER00`…
+`USER08`. Changing `ble_profiles_num` shifts them all.
 
 **After upgrading from v0.8**: HID report IDs changed, so forget the keyboard
 on any BLE host and re-pair.
@@ -99,12 +113,20 @@ on any BLE host and re-pair.
 ## Debugging without a probe
 
 Each half has a `usb_log` variant that replaces defmt with a USB CDC serial
-port (logs at debug level, plus reset reason / last panic on boot):
+port carrying debug-level logs:
 
 ```bash
 cargo make uf2-left-usblog     # → RoKi-left-usblog.uf2
-cargo make uf2-right-usblog    # → RoKi-right-usblog.uf2  (15 s boot countdown)
+cargo make uf2-right-usblog    # → RoKi-right-usblog.uf2
+cargo make uf2-usblog          # both
 ```
+
+The right-half variant waits 15 s after USB enumeration before starting the
+firmware (`starting setup in Ns`), then prints the previous boot's reset
+reason (`RESETREAS`) and panic message (`LAST PANIC`), and logs a `[boot]`
+breadcrumb after each init step. In these builds a panic resets the board
+after 1.5 s instead of halting. The left-half variant just adds the port to
+the normal keyboard USB device.
 
 Open the new COM/`ttyACM` port at any baud rate. On Windows/PowerShell:
 
@@ -115,10 +137,15 @@ $p.Open(); while ($true) { $p.ReadLine() }
 
 Troubleshooting notes:
 
-- **Right half never connects / no buzzer**: the left half logs
-  `Start scanning peripherals` every 30 s but never `Found split peripheral`
-  → the right half isn't running. Check that `sdc::Mem` is large enough for
-  the controller config (`build_sdc` fails silently otherwise).
+- **Right half never connects / no buzzer**: if the left half logs
+  `Start scanning peripherals` every 30 s but never `Found split peripheral`,
+  the right half isn't advertising — most likely not running at all. Flash
+  the right `usb_log` build and look at the last `[boot]` breadcrumb. Known
+  cause: `sdc::Mem` too small for the controller config makes `build_sdc`
+  fail, which with `panic-probe` halts the board silently.
+- **Everything connects but keys/encoders do nothing**: Vial's stored keymap
+  overrides the firmware default. Load `vial_config.json` in Vial, or flash
+  once with `clear_storage: true`.
 - **Red LED blinking, no USB device**: the board is in the bootloader. Two
   resets within ~500 ms (e.g. a crash-reset loop) look like a double-tap to
   the Adafruit bootloader.
@@ -145,18 +172,22 @@ re-applied when the build hash changes (new build) or `clear_storage = true`.
 
 ## Default keymap
 
-Layer 0: QWERTY, `MO(1)` on the outer bottom-row keys, encoders → macros 0–3
-(rotate) / 8–9 (press).
+Layer 0: QWERTY; `MO(1)` on the outer keys of the Z row. Encoders rotate →
+macros 0/1 (left) and 2/3 (right) on layer 0, 4/5 and 6/7 on layer 1. The
+inner thumb keys are macros 8/9 (layer 0) and 10/11 (layer 1) — all macros are
+empty by default and meant to be filled in Vial.
 
 Layer 1 (`MO(1)` held):
 
 ```
 F1    F2    F3    F4    F5    F6        F7    F8    F9    F10   F11   F12
-_     KP/   ¿?    Btn2  Btn3  Btn1      Btn1  Btn3  Btn2  _     _     _
+_     KP/   S-Int1 Btn2  Btn3  Btn1     Btn1  Btn3  Btn2  _     _     _
 _     '     _     ]     \     _         ←     ↓     ↑     →     _     _
 _     _     _     ;     _     _         -     =     [     _     _     _
 ble0  ble1  ble2  _     clrb  M10       M11   Del   _     _     _     dongle
 ```
+
+`S-Int1` = Shift + International1 (JIS `ろ` key; `_` on a Japanese layout).
 
 ## References
 

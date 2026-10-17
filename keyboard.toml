@@ -141,10 +141,12 @@ resolution = 2
 reverse = false
 internal_pullup = true
 
-# Extra event subscribers used by our hand-written processors:
-#   - joystick/pointing: PointingProcessor on the central
-#   - CentralConnectedEvent: buzzer on the peripheral
-#   - ConnectionStatusChangeEvent: buzzer on the central
+# Extra event subscribers for the hand-written processors in src/devices.rs
+# (RMK's defaults only cover its own built-in subscribers):
+#   - pointing:                 PointingProcessor on the central
+#   - central_connected:        PeripheralBuzzer on the right half
+#   - connection_status_change: CentralBuzzer on the left half
+# Exceeding a limit panics at boot with "Failed to create subscriber for …".
 [event.pointing]
 subs = 3
 
