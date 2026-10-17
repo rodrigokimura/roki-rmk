@@ -1,40 +1,44 @@
 [package]
 name = "RoKi"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Haobo Gu <haobogu@outlook.com>"]
 description = "Keyboard firmware written in Rust"
-homepage = "https://github.com/haobogu/rmk"
-repository = "https://github.com/haobogu/rmk"
+homepage = "https://github.com/rmk-rs/rmk"
+repository = "https://github.com/rmk-rs/rmk"
 readme = "README.md"
-edition = "2021"
+edition = "2024"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-rmk = { version = "0.8", features = [
+# `dongle` is enabled on every binary: on the keyboard (central) it adds the
+# dongle bond slot + the `SwitchToDongle` key; on the dongle it enables
+# `rmk::dongle`. `vial` must be on both sides so the dongle relays Vial.
+rmk = { version = "0.9", default-features = false, features = [
+    "storage",
+    "vial",
+    "host_lock",
+    "watchdog",
     "nrf52840_ble",
     "split",
+    "dongle",
     "async_matrix",
     "adafruit_bl",
-    "controller",
 ] }
-nrf-sdc = { git = "https://github.com/alexmoon/nrf-sdc", rev = "11d5c3c", features = [
-    "defmt",
+nrf-sdc = { version = "0.4.0", features = [
     "peripheral",
     "central",
     "nrf52840",
 ] }
-nrf-mpsl = { git = "https://github.com/alexmoon/nrf-sdc", rev = "11d5c3c", features = [
-    "defmt",
+nrf-mpsl = { version = "0.4.0", features = [
     "critical-section-impl",
     "nrf52840",
 ] }
-bt-hci = { version = "0.6", default-features = false, features = ["defmt"] }
+bt-hci = { version = "0.10" }
 
 cortex-m = "0.7.7"
 cortex-m-rt = "0.7.5"
-embassy-time = { version = "0.5", features = ["tick-hz-32_768", "defmt", "defmt-timestamp-uptime"] }
-embassy-nrf = { version = "0.8", features = [
-    "defmt",
+embassy-time = { version = "0.5", features = ["tick-hz-32_768"] }
+embassy-nrf = { version = "0.11", features = [
     "nrf52840",
     "time-driver-rtc1",
     "gpiote",
@@ -42,34 +46,46 @@ embassy-nrf = { version = "0.8", features = [
     "nfc-pins-as-gpio",
     "time",
 ] }
-embassy-executor = { version = "0.9", features = [
-    "defmt",
-    "arch-cortex-m",
+embassy-executor = { version = "0.10", features = [
+    "platform-cortex-m",
     "executor-thread",
 ] }
-defmt = "1.0"
-defmt-rtt = "1.0"
-panic-probe = { version = "1.0", features = ["print-defmt"] }
+defmt = { version = "1", optional = true }
+defmt-rtt = { version = "1", optional = true }
+panic-probe = { version = "1", optional = true, features = ["print-defmt"] }
+log = "0.4"
 static_cell = "2"
+# Needed by rmk's `#[derive(Event)]` macro expansion
+embassy-sync = "0.8"
 
-rand = { version = "0.8.4", default-features = false }
-rand_core = { version = "0.6" }
-rand_chacha = { version = "0.3", default-features = false }
-embassy-usb-driver = "=0.2.0"
+[features]
+default = ["defmt"]
+# Normal build: defmt over RTT (needs a debug probe to read).
+defmt = ["dep:defmt", "dep:defmt-rtt", "dep:panic-probe", "rmk/defmt", "nrf-sdc/defmt", "nrf-mpsl/defmt", "bt-hci/defmt", "embassy-nrf/defmt", "embassy-time/defmt", "embassy-time/defmt-timestamp-uptime", "embassy-executor/defmt"]
+# Debug build: logs over a USB CDC serial port instead of defmt.
+#   cargo build --release --no-default-features --features usb_log --bin left
+usb_log = ["rmk/usb_log"]
+
 
 [build-dependencies]
 xz2 = "0.1.7"
 json = "0.12"
 const-gen = "1.6"
 
-# Split keyboard example
-[[bin]]
-name = "central"
-path = "src/central.rs"
-
+# Left half: split central, the keyboard itself (talks to hosts and the dongle)
 [[bin]]
 name = "left"
 path = "src/left.rs"
+
+# Right half: split peripheral 0
+[[bin]]
+name = "right"
+path = "src/right.rs"
+
+# USB dongle: relays the bonded keyboard (HID + Vial) to the host
+[[bin]]
+name = "dongle"
+path = "src/dongle.rs"
 
 [profile.dev]
 codegen-units = 1      # better optimizations
@@ -85,7 +101,3 @@ debug = true            # no overhead for bare-metal
 opt-level = "z"         # optimize for binary size
 overflow-checks = false
 lto = "fat"
-
-[[bin]]
-name = "right"
-path = "src/right.rs"

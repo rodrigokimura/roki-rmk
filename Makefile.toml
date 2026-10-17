@@ -9,110 +9,77 @@ command = "cargo"
 args = ["build", "--release"]
 dependencies = ["install-llvm-tools", "flip-link"]
 
-[tasks.objcopy-central]
-install_crate = { crate_name = "cargo-binutils", binary = "cargo", test_arg = [
-    "objcopy",
-    "--help",
-] }
-command = "cargo"
-args = [
-    "objcopy",
-    "--release",
-    "--bin",
-    "central",
-    "--",
-    "-O",
-    "ihex",
-    "RoKi-central.hex",
-]
-dependencies = ["build"]
-
 [tasks.objcopy-left]
-install_crate = { crate_name = "cargo-binutils", binary = "cargo", test_arg = [
-    "objcopy",
-    "--help",
-] }
+install_crate = { crate_name = "cargo-binutils", binary = "cargo", test_arg = ["objcopy", "--help"] }
 command = "cargo"
-args = [
-    "objcopy",
-    "--release",
-    "--bin",
-    "left",
-    "--",
-    "-O",
-    "ihex",
-    "RoKi-left.hex",
-]
+args = ["objcopy", "--release", "--bin", "left", "--", "-O", "ihex", "RoKi-left.hex"]
 dependencies = ["build"]
-
-[tasks.uf2-central]
-install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = [
-    "hex-to-uf2",
-    "--help",
-] }
-command = "cargo"
-args = [
-    "hex-to-uf2",
-    "--input-path",
-    "RoKi-central.hex",
-    "--output-path",
-    "RoKi-central.uf2",
-    "--family",
-    "nrf52840",
-]
-dependencies = ["objcopy-central"]
 
 [tasks.uf2-left]
-install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = [
-    "hex-to-uf2",
-    "--help",
-] }
+install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = ["hex-to-uf2", "--help"] }
 command = "cargo"
-args = [
-    "hex-to-uf2",
-    "--input-path",
-    "RoKi-left.hex",
-    "--output-path",
-    "RoKi-left.uf2",
-    "--family",
-    "nrf52840",
-]
+args = ["hex-to-uf2", "--input-path", "RoKi-left.hex", "--output-path", "RoKi-left.uf2", "--family", "nrf52840"]
 dependencies = ["objcopy-left"]
 
-[tasks.uf2]
-dependencies = ["uf2-central", "uf2-left", "uf2-right"]
-
 [tasks.objcopy-right]
-install_crate = { crate_name = "cargo-binutils", binary = "cargo", test_arg = [
-  "objcopy",
-  "--help",
-] }
+install_crate = { crate_name = "cargo-binutils", binary = "cargo", test_arg = ["objcopy", "--help"] }
 command = "cargo"
-args = [
-  "objcopy",
-  "--release",
-  "--bin",
-  "right",
-  "--",
-  "-O",
-  "ihex",
-  "RoKi-right.hex",
-]
+args = ["objcopy", "--release", "--bin", "right", "--", "-O", "ihex", "RoKi-right.hex"]
 dependencies = ["build"]
 
 [tasks.uf2-right]
-install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = [
-  "hex-to-uf2",
-  "--help",
-] }
+install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = ["hex-to-uf2", "--help"] }
 command = "cargo"
-args = [
-  "hex-to-uf2",
-  "--input-path",
-  "RoKi-right.hex",
-  "--output-path",
-  "RoKi-right.uf2",
-  "--family",
-  "nrf52840",
-]
+args = ["hex-to-uf2", "--input-path", "RoKi-right.hex", "--output-path", "RoKi-right.uf2", "--family", "nrf52840"]
 dependencies = ["objcopy-right"]
+
+[tasks.objcopy-dongle]
+install_crate = { crate_name = "cargo-binutils", binary = "cargo", test_arg = ["objcopy", "--help"] }
+command = "cargo"
+args = ["objcopy", "--release", "--bin", "dongle", "--", "-O", "ihex", "RoKi-dongle.hex"]
+dependencies = ["build"]
+
+[tasks.uf2-dongle]
+install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = ["hex-to-uf2", "--help"] }
+command = "cargo"
+args = ["hex-to-uf2", "--input-path", "RoKi-dongle.hex", "--output-path", "RoKi-dongle.uf2", "--family", "nrf52840"]
+dependencies = ["objcopy-dongle"]
+
+[tasks.uf2]
+dependencies = ["uf2-left", "uf2-right", "uf2-dongle"]
+
+# --- Debug: halves with logs over USB serial (no defmt) ----------------------
+[tasks.build-left-usblog]
+command = "cargo"
+args = ["build", "--release", "--no-default-features", "--features", "usb_log", "--bin", "left", "--target-dir", "target/usblog"]
+dependencies = ["install-llvm-tools", "flip-link"]
+
+[tasks.objcopy-left-usblog]
+command = "arm-none-eabi-objcopy"
+args = ["-O", "ihex", "target/usblog/thumbv7em-none-eabihf/release/left", "RoKi-left-usblog.hex"]
+dependencies = ["build-left-usblog"]
+
+[tasks.uf2-left-usblog]
+install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = ["hex-to-uf2", "--help"] }
+command = "cargo"
+args = ["hex-to-uf2", "--input-path", "RoKi-left-usblog.hex", "--output-path", "RoKi-left-usblog.uf2", "--family", "nrf52840"]
+dependencies = ["objcopy-left-usblog"]
+
+[tasks.build-right-usblog]
+command = "cargo"
+args = ["build", "--release", "--no-default-features", "--features", "usb_log", "--bin", "right", "--target-dir", "target/usblog"]
+dependencies = ["install-llvm-tools", "flip-link"]
+
+[tasks.objcopy-right-usblog]
+command = "arm-none-eabi-objcopy"
+args = ["-O", "ihex", "target/usblog/thumbv7em-none-eabihf/release/right", "RoKi-right-usblog.hex"]
+dependencies = ["build-right-usblog"]
+
+[tasks.uf2-right-usblog]
+install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = ["hex-to-uf2", "--help"] }
+command = "cargo"
+args = ["hex-to-uf2", "--input-path", "RoKi-right-usblog.hex", "--output-path", "RoKi-right-usblog.uf2", "--family", "nrf52840"]
+dependencies = ["objcopy-right-usblog"]
+
+[tasks.uf2-usblog]
+dependencies = ["uf2-left-usblog", "uf2-right-usblog"]

@@ -49,8 +49,10 @@ fn main() {
     // Set the linker script to the one provided by cortex-m-rt.
     println!("cargo:rustc-link-arg=-Tlink.x");
 
-    // Set the extra linker script from defmt
-    println!("cargo:rustc-link-arg=-Tdefmt.x");
+    // Set the extra linker script from defmt (only when defmt is enabled)
+    if env::var_os("CARGO_FEATURE_DEFMT").is_some() {
+        println!("cargo:rustc-link-arg=-Tdefmt.x");
+    }
 
     // Use flip-link overflow check: https://github.com/knurling-rs/flip-link
     println!("cargo:rustc-linker=flip-link");
