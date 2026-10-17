@@ -1,5 +1,15 @@
 # TODO: Add PMW3360 Trackball Peripheral (Option 2)
 
+> **Note (RMK v0.9 update):** This plan was written against RMK v0.8 and the
+> old "central = dongle" topology. In v0.9 the left half is the central and the
+> dongle is a separate `rmk::dongle` relay (see `src/dongle.rs`). A trackball
+> would now be **split peripheral 1** sending `PointingEvent`s to the *left half*,
+> which already runs a `PointingProcessor`. Use the v0.9 built-in
+> `rmk::input_device::pmw33xx` driver + `PointingDevice` instead of a hand-written
+> SPI driver; bump `split_peripherals_num` to 2 and add a second
+> `PeripheralMatrixConfig` (0×0) in `src/left.rs`. The step-by-step code below is
+> otherwise outdated.
+
 ## Goal
 Add a 3rd nice!nano (`trackball.rs`) with a **PMW3360 optical sensor**, connected via SPI. It sends `Event::Joystick` (mouse deltas) to the central dongle over BLE split, processed by the existing `JoystickProcessor`.
 
