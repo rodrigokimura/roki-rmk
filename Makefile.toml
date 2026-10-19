@@ -46,7 +46,20 @@ args = ["hex-to-uf2", "--input-path", "RoKi-dongle.hex", "--output-path", "RoKi-
 dependencies = ["objcopy-dongle"]
 
 [tasks.uf2]
-dependencies = ["uf2-left", "uf2-right", "uf2-dongle"]
+dependencies = ["uf2-left", "uf2-right", "uf2-dongle", "uf2-trackball"]
+
+# --- Trackball build / uf2 -----------------------------------------------
+[tasks.objcopy-trackball]
+install_crate = { crate_name = "cargo-binutils", binary = "cargo", test_arg = ["objcopy", "--help"] }
+command = "cargo"
+args = ["objcopy", "--release", "--bin", "trackball", "--", "-O", "ihex", "RoKi-trackball.hex"]
+dependencies = ["build"]
+
+[tasks.uf2-trackball]
+install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = ["hex-to-uf2", "--help"] }
+command = "cargo"
+args = ["hex-to-uf2", "--input-path", "RoKi-trackball.hex", "--output-path", "RoKi-trackball.uf2", "--family", "nrf52840"]
+dependencies = ["objcopy-trackball"]
 
 # --- Debug: halves with logs over USB serial (no defmt) ----------------------
 [tasks.build-left-usblog]
@@ -55,7 +68,7 @@ args = ["build", "--release", "--no-default-features", "--features", "usb_log", 
 dependencies = ["install-llvm-tools", "flip-link"]
 
 [tasks.objcopy-left-usblog]
-command = "arm-none-eabi-objcopy"
+command = "rust-objcopy"
 args = ["-O", "ihex", "target/usblog/thumbv7em-none-eabihf/release/left", "RoKi-left-usblog.hex"]
 dependencies = ["build-left-usblog"]
 
@@ -71,7 +84,7 @@ args = ["build", "--release", "--no-default-features", "--features", "usb_log", 
 dependencies = ["install-llvm-tools", "flip-link"]
 
 [tasks.objcopy-right-usblog]
-command = "arm-none-eabi-objcopy"
+command = "rust-objcopy"
 args = ["-O", "ihex", "target/usblog/thumbv7em-none-eabihf/release/right", "RoKi-right-usblog.hex"]
 dependencies = ["build-right-usblog"]
 
@@ -82,4 +95,20 @@ args = ["hex-to-uf2", "--input-path", "RoKi-right-usblog.hex", "--output-path", 
 dependencies = ["objcopy-right-usblog"]
 
 [tasks.uf2-usblog]
-dependencies = ["uf2-left-usblog", "uf2-right-usblog"]
+dependencies = ["uf2-left-usblog", "uf2-right-usblog", "uf2-trackball-usblog"]
+
+[tasks.build-trackball-usblog]
+command = "cargo"
+args = ["build", "--release", "--no-default-features", "--features", "usb_log", "--bin", "trackball", "--target-dir", "target/usblog"]
+dependencies = ["install-llvm-tools", "flip-link"]
+
+[tasks.objcopy-trackball-usblog]
+command = "rust-objcopy"
+args = ["-O", "ihex", "target/usblog/thumbv7em-none-eabihf/release/trackball", "RoKi-trackball-usblog.hex"]
+dependencies = ["build-trackball-usblog"]
+
+[tasks.uf2-trackball-usblog]
+install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = ["hex-to-uf2", "--help"] }
+command = "cargo"
+args = ["hex-to-uf2", "--input-path", "RoKi-trackball-usblog.hex", "--output-path", "RoKi-trackball-usblog.uf2", "--family", "nrf52840"]
+dependencies = ["objcopy-trackball-usblog"]

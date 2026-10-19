@@ -6,7 +6,7 @@ use rmk::types::modifier::ModifierCombination;
 use rmk::{a, encoder, k, macros, mo, user, wm};
 
 pub(crate) const COL: usize = 12;
-pub(crate) const ROW: usize = 5;
+pub(crate) const ROW: usize = 6;
 pub(crate) const NUM_LAYER: usize = 2;
 pub(crate) const NUM_ENCODER: usize = 2;
 
@@ -29,6 +29,7 @@ pub const fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
             [k!(LShift), k!(A),   k!(S),   k!(D),   k!(F),   k!(G),        k!(H),   k!(J),   k!(K),   k!(L),   k!(Slash), k!(RShift)],
             [mo!(1),     k!(Z),   k!(X),   k!(C),   k!(V),   k!(B),        k!(N),   k!(M),   k!(Comma), k!(Dot), k!(Backslash), mo!(1)],
             [k!(LCtrl),  k!(LGui), k!(LAlt), k!(Space), k!(Enter), macros!(8),   macros!(9), k!(Backspace), k!(Space), k!(RAlt), k!(RGui), k!(RCtrl)],
+            [k!(MouseBtn1), k!(MouseBtn2), k!(MouseBtn3), k!(MouseBtn4), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
         ],
         // Layer 1
         [
@@ -41,6 +42,8 @@ pub const fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
                 k!(Minus), k!(Equal), k!(LeftBracket), a!(Transparent), a!(Transparent), a!(Transparent)],
             [BLE0, BLE1, BLE2, a!(Transparent), CLEAR_BOND, macros!(10),
                 macros!(11), k!(Delete), a!(Transparent), a!(Transparent), a!(Transparent), DONGLE],
+            [a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent),
+                a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
         ],
     ]
 }

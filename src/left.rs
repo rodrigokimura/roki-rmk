@@ -84,7 +84,7 @@ fn build_sdc<'d, const N: usize>(
         .support_phy_update_central()
         .support_phy_update_peripheral()
         .support_le_2m_phy()
-        .central_count(1)? // one split peripheral (right half)
+        .central_count(2)? // right half + trackball
         .peripheral_count(1)? // one host link (BLE profile or dongle)
         .buffer_cfg(L2CAP_MTU as u16, L2CAP_MTU as u16, L2CAP_TXQ, L2CAP_RXQ)?
         .build(p, rng, mpsl, mem)
@@ -223,7 +223,10 @@ async fn main(spawner: Spawner) {
         sdc,
         ble_addr(),
         rmk_config,
-        [PeripheralMatrixConfig { rows: 5, cols: 6, row_offset: 0, col_offset: 6 }],
+        [
+            PeripheralMatrixConfig { rows: 5, cols: 6, row_offset: 0, col_offset: 6 },
+            PeripheralMatrixConfig { rows: 1, cols: 4, row_offset: 5, col_offset: 0 },
+        ],
     )
     .with_host_service(&host_service);
 
