@@ -1,0 +1,73 @@
+# RoKi Trackball — RMK v0.9 configuration
+#
+# Standalone BLE/USB mouse: PMW3360 optical sensor + 4 buttons on one
+# nice!nano v2. Not part of the keyboard's split; it bonds to hosts directly
+# (3 BLE profiles) or works over USB.
+#
+# src/main.rs hand-writes the wiring; this file is the single source of truth
+# for layout/keymap constants (read by rmk-types' build.rs via
+# KEYBOARD_TOML_PATH) and documents the pins.
+
+[keyboard]
+name = "RoKi Trackball"
+product_name = "RoKi Trackball"
+vendor_id = 0x4c4b
+product_id = 0x5254
+manufacturer = "RoKi"
+chip = "nrf52840"
+
+[rmk]
+ble_profiles_num = 3
+
+[host]
+unlock_keys = [[0, 0], [0, 3]]
+
+[layout]
+rows = 1
+cols = 4
+map = """
+(0, 0) (0, 1) (0, 2) (0, 3)
+"""
+
+[keymap]
+layers = 2
+
+[[keymap.layer]] # Layer 0
+# Button 4 (outer): tap = mouse button 4 (back), hold = layer 1
+keys = """
+btn1  btn2  btn3  LT(1, btn4)
+"""
+
+[[keymap.layer]] # Layer 1 (hold button 4)
+# ble0..ble2 = switch to BLE profile 0/1/2 (hold 5 s: clear that bond and re-pair)
+keys = """
+ble0  ble1  ble2  _
+"""
+
+[aliases]
+btn1 = "MouseBtn1"
+btn2 = "MouseBtn2"
+btn3 = "MouseBtn3"
+btn4 = "MouseBtn4"
+# With ble_profiles_num = N: User(0..N-1) = profile.
+ble0 = "User(0)"
+ble1 = "User(1)"
+ble2 = "User(2)"
+
+[ble]
+enabled = true
+default_tx_power = 0
+
+[storage]
+enabled = true
+clear_storage = false
+
+# Buttons: 1x4 row2col matrix
+[matrix]
+row2col = true
+row_pins = ["P0_03"]
+col_pins = ["P0_04", "P0_28", "P0_30", "P0_05"]
+
+# PMW3360 on TWISPI1 (SPI mode 3, 2 MHz):
+#   SCK P0_17  MOSI P0_20  MISO P0_29  NCS P1_13  (MOTION P1_11 wired, unused: polled)
+# Buzzer: P0_06

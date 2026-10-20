@@ -1,7 +1,13 @@
 # RoKi — RMK Firmware
 
-Hand-written firmware for the RoKi split ergonomic keyboard, built on
-[RMK](https://github.com/rmk-rs/rmk) **v0.9** with the native **dongle** feature.
+Hand-written firmware for the RoKi split ergonomic keyboard and the RoKi
+trackball, built on [RMK](https://github.com/rmk-rs/rmk) **v0.9** with the
+native **dongle** feature.
+
+The repo is a Cargo workspace with two independent firmware crates:
+
+- `keyboard/` — the split keyboard: `left` (central), `right` (peripheral), `dongle`
+- `trackball/` — a standalone BLE/USB trackball (PMW3360 + 4 buttons)
 
 ## Topology
 
@@ -20,6 +26,9 @@ Hand-written firmware for the RoKi split ergonomic keyboard, built on
 - The **dongle** is a pure relay: it bonds to exactly one keyboard and forwards HID
   reports and Vial traffic over USB. It has no keymap and stores only the bond.
 - The **right half** is split peripheral 0.
+- The **trackball** is a separate device, not part of the split: it bonds to
+  hosts directly over BLE (3 profiles) or works over USB. It has its own keymap,
+  storage and Vial definition.
 
 ## Hardware
 
@@ -33,20 +42,41 @@ Three nice!nano v2 (nRF52840) boards. Each **half** has:
 
 The **dongle** is a bare nice!nano on USB — no matrix, no peripherals.
 
+The **trackball** is a fourth nice!nano v2:
+
+| Function | Pins |
+|----------|------|
+| PMW3360 (SPI mode 3, 2 MHz, 1600 CPI) | SCK `P0.17`, MOSI `P0.20`, MISO `P0.29`, NCS `P1.13`, VCC 3.3 V. MOTION on `P1.11` is wired but unused: the driver polls instead (see `main.rs`) |
+| Buttons (1×4 row2col) | row `P0.03`; cols `P0.04 P0.28 P0.30 P0.05` |
+| Buzzer | `P0.06` |
+| Battery | VDDH/5 via SAADC |
+
+Buttons 1–3 are mouse buttons 1–3. Button 4 is mouse button 4 (back) on tap
+and **layer 1** on hold; layer 1 has BLE profile 0/1/2 on buttons 1–3 (hold a
+profile key 5 s to clear its bond and re-pair).
+
 ## File layout
+
+Two crates because RMK derives layout/split constants per crate from its own
+`keyboard.toml` (`KEYBOARD_TOML_PATH`, set in each crate's `.cargo/config.toml`),
+and the two devices need different RMK features (`split`/`dongle` vs. none).
 
 | File | Role |
 |------|------|
-| `src/left.rs`    | Central: matrix, encoder 0, joystick (CCW 45°), battery, buzzer, USB + BLE transports |
-| `src/right.rs`   | Peripheral 0: matrix, encoder 1, joystick (CW 45°), battery, buzzer |
-| `src/dongle.rs`  | USB dongle: `rmk::dongle::Dongle` + `UsbTransport` sharing a `DongleRouter` |
-| `src/devices.rs` | Shared `JoystickReader` (`#[input_device]`) and buzzer `#[processor]`s |
-| `src/keymap.rs`  | Keymap, encoder map, Vial config (kept in sync with `keyboard.toml`) |
-| `src/fmt.rs`     | Logging shim (`defmt` by default, `log` over USB with `--features usb_log`) + crash recorder |
-| `keyboard.toml`  | Layout/keymap/pins; read at build time for RMK constants |
-| `vial.json`      | Vial keyboard definition (compressed into the firmware by `build.rs`) |
-| `keyboard-layout.json` | KLE source for the `vial.json` layout |
-| `vial_config.json` | Vial `.vil` export matching the firmware defaults (load it in Vial after a storage reset) |
+| `keyboard/src/left.rs`    | Central: matrix, encoder 0, joystick (CCW 45°), battery, buzzer, USB + BLE transports |
+| `keyboard/src/right.rs`   | Peripheral 0: matrix, encoder 1, joystick (CW 45°), battery, buzzer |
+| `keyboard/src/dongle.rs`  | USB dongle: `rmk::dongle::Dongle` + `UsbTransport` sharing a `DongleRouter` |
+| `keyboard/src/devices.rs` | Shared `JoystickReader` (`#[input_device]`) and buzzer `#[processor]`s |
+| `keyboard/src/keymap.rs`  | Keymap, encoder map, Vial config (kept in sync with `keyboard/keyboard.toml`) |
+| `keyboard/keyboard.toml`  | Layout/keymap/pins; read at build time for RMK constants |
+| `keyboard/vial.json`      | Vial keyboard definition (compressed into the firmware by `build.rs`) |
+| `keyboard/keyboard-layout.json` | KLE source for the `vial.json` layout |
+| `keyboard/vial_config.json` | Vial `.vil` export matching the firmware defaults (load it in Vial after a storage reset) |
+| `trackball/src/main.rs`   | Trackball: 1×4 matrix, PMW3360 (`rmk::input_device::pmw33xx`), battery, buzzer, USB + BLE |
+| `trackball/src/devices.rs`| Buzzer `#[processor]` for host connect/disconnect |
+| `trackball/src/keymap.rs` | Trackball keymap + Vial config |
+| `trackball/keyboard.toml`, `trackball/vial.json` | Trackball layout / Vial definition |
+| `*/src/fmt.rs`            | Logging shim (`defmt` by default, `log` over USB with `--features usb_log`) + crash recorder |
 
 ## Prerequisites
 
@@ -63,7 +93,13 @@ cargo install cargo-make flip-link cargo-binutils cargo-hex-to-uf2
 RUST_MIN_STACK=67108864 cargo make uf2 --release
 ```
 
-Outputs: `RoKi-left.uf2`, `RoKi-right.uf2`, `RoKi-dongle.uf2`.
+Outputs: `RoKi-left.uf2`, `RoKi-right.uf2`, `RoKi-dongle.uf2`, `RoKi-trackball.uf2`.
+Single targets: `cargo make uf2-left` etc. Debug builds with logs over USB
+serial: `cargo make uf2-usblog` / `cargo make uf2-trackball-usblog`.
+
+To build directly with cargo, run from the crate directory
+(`cd keyboard && cargo build --release`), not the workspace root, so the right
+`KEYBOARD_TOML_PATH` is picked up.
 
 ## Flash
 
@@ -110,23 +146,32 @@ split peer, `User(N+5)` switch to dongle. In Vial they appear as `USER00`…
 **After upgrading from v0.8**: HID report IDs changed, so forget the keyboard
 on any BLE host and re-pair.
 
+### Trackball
+
+The trackball pairs like any BLE mouse: on first boot it advertises on profile
+0 — pick "RoKi Trackball" in the host's Bluetooth settings. Hold button 4 and
+tap button 1/2/3 to switch to profile 0/1/2; hold the profile key 5 s to clear
+that bond and advertise again. It also works as a USB mouse when plugged in.
+The buzzer chirps when a host connects or disconnects.
+
 ## Debugging without a probe
 
-Each half has a `usb_log` variant that replaces defmt with a USB CDC serial
-port carrying debug-level logs:
+Each half (and the trackball) has a `usb_log` variant that replaces defmt with
+a USB CDC serial port carrying debug-level logs:
 
 ```bash
 cargo make uf2-left-usblog     # → RoKi-left-usblog.uf2
 cargo make uf2-right-usblog    # → RoKi-right-usblog.uf2
-cargo make uf2-usblog          # both
+cargo make uf2-trackball-usblog
+cargo make uf2-usblog          # all three
 ```
 
 The right-half variant waits 15 s after USB enumeration before starting the
 firmware (`starting setup in Ns`), then prints the previous boot's reset
 reason (`RESETREAS`) and panic message (`LAST PANIC`), and logs a `[boot]`
 breadcrumb after each init step. In these builds a panic resets the board
-after 1.5 s instead of halting. The left-half variant just adds the port to
-the normal keyboard USB device.
+after 1.5 s instead of halting. The left-half and trackball variants just add
+the port to the normal USB HID device.
 
 Open the new COM/`ttyACM` port at any baud rate. On Windows/PowerShell:
 
@@ -146,13 +191,20 @@ Troubleshooting notes:
 - **Everything connects but keys/encoders do nothing**: Vial's stored keymap
   overrides the firmware default. Load `vial_config.json` in Vial, or flash
   once with `clear_storage: true`.
+- **Trackball cursor doesn't move**: look for `PMW3360 detected, product ID:
+  0x42` in the trackball `usb_log` output. `Invalid product id: 255` means
+  MISO never goes low — sensor unpowered or MISO/NCS miswired. `Firmware
+  signature check failed` means the sensor needs the SROM blob
+  (`Pmw33xx::new_with_firmware`). The report rate must stay at 125 Hz: the
+  HID link carries one report per connection interval, and a faster rate
+  overflows the pointing channel so the cursor stalls and jumps.
 - **Red LED blinking, no USB device**: the board is in the bootloader. Two
   resets within ~500 ms (e.g. a crash-reset loop) look like a double-tap to
   the Adafruit bootloader.
 
 ## Calibrating joysticks
 
-Tune the constants in `src/devices.rs` (`JoystickReader`):
+Tune the constants in `keyboard/src/devices.rs` (`JoystickReader`):
 
 ```rust
 const CENTER_X: i32 = 1900;  // resting ADC value
@@ -163,7 +215,7 @@ const DEAD_ZONE: i32 = 2;    // mouse units
 
 ## Updating the keymap
 
-Edit both `keyboard.toml` (`[[keymap.layer]]`) and `src/keymap.rs` — the Rust
+Edit both the crate's `keyboard.toml` (`[[keymap.layer]]`) and `src/keymap.rs` — the Rust
 binaries use the hardcoded arrays; the TOML is the documented source of truth
 and drives RMK's build-time constants. Keep `vial_config.json` in sync too.
 

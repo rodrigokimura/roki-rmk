@@ -1,0 +1,6 @@
+# Per-crate: RMK resolves layout constants from this crate's keyboard.toml and
+# the two RoKi crates need different rmk features (split vs. not), so each is
+# built from its own directory (see Makefile.toml). Cargo merges this with the
+# workspace-root .cargo/config.toml (runner, linker, target, DEFMT_LOG).
+[env]
+KEYBOARD_TOML_PATH = { value = "keyboard.toml", relative = true }
