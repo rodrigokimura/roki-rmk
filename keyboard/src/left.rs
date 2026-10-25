@@ -38,6 +38,7 @@ use rmk::input_device::pointing::{PointingProcessor, PointingProcessorConfig};
 use rmk::input_device::rotary_encoder::RotaryEncoder;
 use rmk::keyboard::Keyboard;
 use rmk::matrix::Matrix;
+use rmk::matrix::direct_pin::DirectPinMatrix;
 use rmk::split::PeripheralMatrixConfig;
 use rmk::usb::UsbTransport;
 use rmk::watchdog::Nrf52Watchdog;
@@ -186,6 +187,15 @@ async fn main(spawner: Spawner) {
     // ROW=5, COL=6, COL2ROW=false (row2col), offsets (0, 0)
     let mut matrix = Matrix::<_, _, _, 5, 6, false, 0, 0>::new(row_pins, col_pins, debouncer);
 
+    // --- Direct-pin key (P0.22 → unified position (5, 0)) ------------------
+    // Extra key wired straight to P0_22 (switch to GND), scanned alongside
+    // the row/col matrix; see keyboard.toml [split.central.matrix].
+    let mut direct_matrix = DirectPinMatrix::<_, _, 1, 1, 1, 5, 0>::new(
+        [[Some(Input::new(p.P0_22, Pull::Up))]],
+        DefaultDebouncer::new(),
+        true, // low active
+    );
+
     // --- Encoder 0 --------------------------------------------------------
     let enc_a = Input::new(p.P0_17, Pull::Up);
     let enc_b = Input::new(p.P0_20, Pull::Up);
@@ -223,7 +233,7 @@ async fn main(spawner: Spawner) {
         sdc,
         ble_addr(),
         rmk_config,
-        [PeripheralMatrixConfig { rows: 5, cols: 6, row_offset: 0, col_offset: 6 }],
+        [PeripheralMatrixConfig { rows: 6, cols: 6, row_offset: 0, col_offset: 6 }],
     )
     .with_host_service(&host_service);
 
@@ -231,6 +241,7 @@ async fn main(spawner: Spawner) {
 
     run_all!(
         matrix,
+        direct_matrix,
         encoder,
         joystick,
         pointing_processor,

@@ -6,7 +6,7 @@ use rmk::types::modifier::ModifierCombination;
 use rmk::{a, encoder, k, macros, mo, user, wm};
 
 pub(crate) const COL: usize = 12;
-pub(crate) const ROW: usize = 5;
+pub(crate) const ROW: usize = 6;
 pub(crate) const NUM_LAYER: usize = 3;
 pub(crate) const NUM_ENCODER: usize = 2;
 
@@ -32,6 +32,9 @@ pub const fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
             [k!(LShift), k!(A),   k!(S),   k!(D),   k!(F),   k!(G),        k!(H),   k!(J),   k!(K),   k!(L),   k!(Slash), k!(RShift)],
             [mo!(1),     k!(Z),   k!(X),   k!(C),   k!(V),   k!(B),        k!(N),   k!(M),   k!(Comma), k!(Dot), k!(Backslash), mo!(1)],
             [k!(LCtrl),  k!(LGui), k!(LAlt), k!(Space), k!(Enter), k!(AudioMute),   k!(AudioMute), k!(Backspace), k!(Space), k!(RAlt), k!(RGui), k!(RCtrl)],
+            // Direct-pin keys: (5, 0) = left P0.22, (5, 6) = right P0.22.
+            [k!(A), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent),
+                k!(B), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
         ],
         // Layer 1
         [
@@ -44,6 +47,8 @@ pub const fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
                 k!(Minus), k!(Equal), k!(LeftBracket), a!(Transparent), a!(Transparent), a!(Transparent)],
             [a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent),
                 a!(Transparent), k!(Delete), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
+            [a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent),
+                a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
         ],
         // Layer 3
         [
@@ -57,6 +62,8 @@ pub const fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
                 a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
             [BLE0, BLE1, BLE2, DONGLE, BLE_PREV, a!(Transparent),
                 a!(Transparent), BLE_NEXT, a!(Transparent), a!(Transparent), CLEAR_SPLIT, CLEAR_BOND],
+            [a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent),
+                a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
         ],
     ]
 }

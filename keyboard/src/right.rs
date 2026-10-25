@@ -35,6 +35,7 @@ use rmk::futures::future::join;
 use rmk::input_device::battery::BatteryProcessor;
 use rmk::input_device::rotary_encoder::RotaryEncoder;
 use rmk::matrix::Matrix;
+use rmk::matrix::direct_pin::DirectPinMatrix;
 use rmk::run_all;
 use rmk::split::peripheral::run_rmk_split_peripheral;
 use rmk::storage::new_storage_without_keymap;
@@ -219,6 +220,15 @@ async fn main(spawner: Spawner) {
     // Local 5x6; the central places us at col_offset 6 (PeripheralMatrixConfig).
     let mut matrix = Matrix::<_, _, _, 5, 6, false>::new(row_pins, col_pins, debouncer);
 
+    // --- Direct-pin key (P0.22 → local (5, 0), unified (5, 6)) -------------
+    // Extra key wired straight to P0_22 (switch to GND), scanned alongside
+    // the row/col matrix; the central adds col_offset 6 to the position.
+    let mut direct_matrix = DirectPinMatrix::<_, _, 1, 1, 1, 5, 0>::new(
+        [[Some(Input::new(p.P0_22, Pull::Up))]],
+        DefaultDebouncer::new(),
+        true, // low active
+    );
+
     // --- Encoder 1 --------------------------------------------------------
     let enc_a = Input::new(p.P0_17, Pull::Up);
     let enc_b = Input::new(p.P0_20, Pull::Up);
@@ -250,7 +260,7 @@ async fn main(spawner: Spawner) {
     let mut watchdog_runner = Nrf52Watchdog::default_runner(p.WDT);
 
     join(
-        run_all!(matrix, encoder, joystick, battery_processor, buzzer, storage, watchdog_runner),
+        run_all!(matrix, direct_matrix, encoder, joystick, battery_processor, buzzer, storage, watchdog_runner),
         run_rmk_split_peripheral(0, sdc, ble_addr()),
     )
     .await;

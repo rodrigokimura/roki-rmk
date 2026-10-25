@@ -35,6 +35,7 @@ The repo is a Cargo workspace with two independent firmware crates:
 Three nice!nano v2 (nRF52840) boards. Each **half** has:
 
 - **Matrix**: 5×6, row2col (rows `P0.24 P1.00 P0.11 P1.04 P1.06`; columns differ per side, see `keyboard.toml`)
+- **Direct-pin key**: one extra key wired straight to `P0.22` (switch to GND), scanned alongside the row/col matrix as a 1×1 `DirectPinMatrix` (pull-up, low-active). It sits at unified position (5, 0) on the left and (5, 6) on the right — the unified layout is 6 rows × 12 cols, with row 5 otherwise unpopulated. RMK's TOML schema can't mix a normal matrix with direct pins, so it's hand-wired in `left.rs`/`right.rs` and only documented in `keyboard.toml`
 - **Encoder**: `P0.17` / `P0.20`, internal pull-up, resolution 2
 - **Joystick**: `P0.31` X / `P0.29` Y, rotated 45° (left CCW, right CW)
 - **Buzzer**: piezo on `P0.06`, R2-D2 connect/disconnect chirps
@@ -63,8 +64,8 @@ and the two devices need different RMK features (`split`/`dongle` vs. none).
 
 | File | Role |
 |------|------|
-| `keyboard/src/left.rs`    | Central: matrix, encoder 0, joystick (CCW 45°), battery, buzzer, USB + BLE transports |
-| `keyboard/src/right.rs`   | Peripheral 0: matrix, encoder 1, joystick (CW 45°), battery, buzzer |
+| `keyboard/src/left.rs`    | Central: matrix + direct-pin key (`P0.22`), encoder 0, joystick (CCW 45°), battery, buzzer, USB + BLE transports |
+| `keyboard/src/right.rs`   | Peripheral 0: matrix + direct-pin key (`P0.22`), encoder 1, joystick (CW 45°), battery, buzzer |
 | `keyboard/src/dongle.rs`  | USB dongle: `rmk::dongle::Dongle` + `UsbTransport` sharing a `DongleRouter` |
 | `keyboard/src/devices.rs` | Shared `JoystickReader` (`#[input_device]`) and buzzer `#[processor]`s |
 | `keyboard/src/keymap.rs`  | Keymap, encoder map, Vial config (kept in sync with `keyboard/keyboard.toml`) |
@@ -218,6 +219,12 @@ const DEAD_ZONE: i32 = 2;    // mouse units
 Edit both the crate's `keyboard.toml` (`[[keymap.layer]]`) and `src/keymap.rs` — the Rust
 binaries use the hardcoded arrays; the TOML is the documented source of truth
 and drives RMK's build-time constants. Keep `vial_config.json` in sync too.
+
+The keymap is 6×12: rows 0–4 are the wired matrix, row 5 is the direct-pin
+row — only (5, 0) (left `P0.22`) and (5, 6) (right `P0.22`) have keys. Both
+are transparent by default; assign them in Vial. Adding a device that
+publishes keyboard events may require raising `[event.keyboard].pubs` in
+`keyboard.toml` (currently 6).
 
 Vial's stored keymap overrides the firmware default; the default is only
 re-applied when the build hash changes (new build) or `clear_storage = true`.
