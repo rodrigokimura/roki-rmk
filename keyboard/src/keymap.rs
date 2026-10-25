@@ -7,7 +7,7 @@ use rmk::{a, encoder, k, macros, mo, user, wm};
 
 pub(crate) const COL: usize = 12;
 pub(crate) const ROW: usize = 5;
-pub(crate) const NUM_LAYER: usize = 2;
+pub(crate) const NUM_LAYER: usize = 3;
 pub(crate) const NUM_ENCODER: usize = 2;
 
 // With `ble_profiles_num = 3`: User(0..2) = profile, User(5) = clear current
@@ -16,7 +16,10 @@ pub(crate) const NUM_ENCODER: usize = 2;
 const BLE0: KeyAction = user!(0);
 const BLE1: KeyAction = user!(1);
 const BLE2: KeyAction = user!(2);
+const BLE_NEXT: KeyAction = user!(3);
+const BLE_PREV: KeyAction = user!(4);
 const CLEAR_BOND: KeyAction = user!(5);
+const CLEAR_SPLIT: KeyAction = user!(6);
 const DONGLE: KeyAction = user!(8);
 
 #[rustfmt::skip]
@@ -24,11 +27,11 @@ pub const fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
     [
         // Layer 0
         [
-            [k!(Escape), k!(Kc1), k!(Kc2), k!(Kc3), k!(Kc4), k!(Kc5),      k!(Kc6), k!(Kc7), k!(Kc8), k!(Kc9), k!(Kc0), k!(Escape)],
+            [k!(Escape), k!(Kc1), k!(Kc2), k!(Kc3), k!(Kc4), k!(Kc5),      k!(Kc6), k!(Kc7), k!(Kc8), k!(Kc9), k!(Kc0), mo!(2)],
             [k!(Tab),    k!(Q),   k!(W),   k!(E),   k!(R),   k!(T),        k!(Y),   k!(U),   k!(I),   k!(O),   k!(P),   k!(Grave)],
             [k!(LShift), k!(A),   k!(S),   k!(D),   k!(F),   k!(G),        k!(H),   k!(J),   k!(K),   k!(L),   k!(Slash), k!(RShift)],
             [mo!(1),     k!(Z),   k!(X),   k!(C),   k!(V),   k!(B),        k!(N),   k!(M),   k!(Comma), k!(Dot), k!(Backslash), mo!(1)],
-            [k!(LCtrl),  k!(LGui), k!(LAlt), k!(Space), k!(Enter), macros!(8),   macros!(9), k!(Backspace), k!(Space), k!(RAlt), k!(RGui), k!(RCtrl)],
+            [k!(LCtrl),  k!(LGui), k!(LAlt), k!(Space), k!(Enter), k!(AudioMute),   k!(AudioMute), k!(Backspace), k!(Space), k!(RAlt), k!(RGui), k!(RCtrl)],
         ],
         // Layer 1
         [
@@ -39,8 +42,21 @@ pub const fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
                 k!(Left), k!(Down), k!(Up), k!(Right), a!(Transparent), a!(Transparent)],
             [a!(Transparent), a!(Transparent), a!(Transparent), k!(Semicolon), a!(Transparent), a!(Transparent),
                 k!(Minus), k!(Equal), k!(LeftBracket), a!(Transparent), a!(Transparent), a!(Transparent)],
-            [BLE0, BLE1, BLE2, a!(Transparent), CLEAR_BOND, macros!(10),
-                macros!(11), k!(Delete), a!(Transparent), a!(Transparent), a!(Transparent), DONGLE],
+            [a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent),
+                a!(Transparent), k!(Delete), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
+        ],
+        // Layer 3
+        [
+            [a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent),
+                a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
+            [a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent),
+                a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
+            [a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent),
+                a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
+            [a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent),
+                a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
+            [BLE0, BLE1, BLE2, DONGLE, BLE_PREV, a!(Transparent),
+                a!(Transparent), BLE_NEXT, a!(Transparent), a!(Transparent), CLEAR_SPLIT, CLEAR_BOND],
         ],
     ]
 }
@@ -48,12 +64,16 @@ pub const fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
 pub const fn get_default_encoder_map() -> [[EncoderAction; NUM_ENCODER]; NUM_LAYER] {
     [
         [
-            encoder!(macros!(0), macros!(1)),
-            encoder!(macros!(2), macros!(3)),
+            encoder!(k!(BrightnessUp), k!(BrightnessDown)),
+            encoder!(k!(AudioVolUp), k!(AudioVolDown)),
         ],
         [
-            encoder!(macros!(4), macros!(5)),
-            encoder!(macros!(6), macros!(7)),
+            encoder!(k!(MouseWheelUp), k!(MouseWheelDown)),
+            encoder!(k!(MouseWheelUp), k!(MouseWheelDown)),
+        ],
+        [
+            encoder!(a!(Transparent), a!(Transparent)),
+            encoder!(a!(Transparent), a!(Transparent)),
         ],
     ]
 }

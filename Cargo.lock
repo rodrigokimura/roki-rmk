@@ -2052,7 +2052,31 @@ dependencies = [
 
 [[package]]
 name = "roki"
-version = "0.2.0"
+version = "0.3.0"
+dependencies = [
+ "bt-hci",
+ "const-gen",
+ "cortex-m",
+ "cortex-m-rt",
+ "defmt 1.1.0",
+ "defmt-rtt",
+ "embassy-executor",
+ "embassy-nrf",
+ "embassy-sync 0.8.0",
+ "embassy-time",
+ "json",
+ "log",
+ "nrf-mpsl",
+ "nrf-sdc",
+ "panic-probe",
+ "rmk",
+ "static_cell",
+ "xz2",
+]
+
+[[package]]
+name = "roki-trackball"
+version = "0.3.0"
 dependencies = [
  "bt-hci",
  "const-gen",

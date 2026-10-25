@@ -1,85 +1,263 @@
+# RoKi build tasks.
+#
+#   cargo make uf2                 all release UF2s (left, right, dongle, trackball)
+#   cargo make uf2-<name>          one of them
+#   cargo make uf2-usblog          debug variants with logs over USB serial
+#   cargo make uf2-<name>-usblog
+#
+# The two crates (keyboard/, trackball/) are built from their own directories
+# so each picks up its own .cargo/config.toml (KEYBOARD_TOML_PATH) and rmk
+# feature set; cargo still writes everything to the workspace target/.
+
+[config]
+default_to_workspace = false
+
 [tasks.install-llvm-tools]
 install_crate = { rustup_component_name = "llvm-tools" }
 
 [tasks.flip-link]
-install_crate = { crate_name = "flip-link", binary = "flip-link", test_arg = ["-h"] }
+install_crate = { crate_name = "flip-link", binary = "flip-link", test_arg = [
+  "-h",
+] }
 
-[tasks.build]
+[tasks.hex-to-uf2]
+install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = [
+  "hex-to-uf2",
+  "--help",
+] }
+
+# --- Release builds -----------------------------------------------------------
+[tasks.build-keyboard]
+cwd = "keyboard"
 command = "cargo"
 args = ["build", "--release"]
 dependencies = ["install-llvm-tools", "flip-link"]
 
-[tasks.objcopy-left]
-install_crate = { crate_name = "cargo-binutils", binary = "cargo", test_arg = ["objcopy", "--help"] }
+[tasks.build-trackball]
+cwd = "trackball"
 command = "cargo"
-args = ["objcopy", "--release", "--bin", "left", "--", "-O", "ihex", "RoKi-left.hex"]
-dependencies = ["build"]
+args = ["build", "--release"]
+dependencies = ["install-llvm-tools", "flip-link"]
+
+[tasks.build]
+dependencies = ["build-keyboard", "build-trackball"]
+
+[tasks.objcopy-left]
+command = "rust-objcopy"
+args = [
+  "-O",
+  "ihex",
+  "target/thumbv7em-none-eabihf/release/left",
+  "RoKi-left.hex",
+]
+dependencies = ["build-keyboard"]
 
 [tasks.uf2-left]
-install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = ["hex-to-uf2", "--help"] }
 command = "cargo"
-args = ["hex-to-uf2", "--input-path", "RoKi-left.hex", "--output-path", "RoKi-left.uf2", "--family", "nrf52840"]
-dependencies = ["objcopy-left"]
+args = [
+  "hex-to-uf2",
+  "--input-path",
+  "RoKi-left.hex",
+  "--output-path",
+  "RoKi-left.uf2",
+  "--family",
+  "nrf52840",
+]
+dependencies = ["hex-to-uf2", "objcopy-left"]
 
 [tasks.objcopy-right]
-install_crate = { crate_name = "cargo-binutils", binary = "cargo", test_arg = ["objcopy", "--help"] }
-command = "cargo"
-args = ["objcopy", "--release", "--bin", "right", "--", "-O", "ihex", "RoKi-right.hex"]
-dependencies = ["build"]
+command = "rust-objcopy"
+args = [
+  "-O",
+  "ihex",
+  "target/thumbv7em-none-eabihf/release/right",
+  "RoKi-right.hex",
+]
+dependencies = ["build-keyboard"]
 
 [tasks.uf2-right]
-install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = ["hex-to-uf2", "--help"] }
 command = "cargo"
-args = ["hex-to-uf2", "--input-path", "RoKi-right.hex", "--output-path", "RoKi-right.uf2", "--family", "nrf52840"]
-dependencies = ["objcopy-right"]
+args = [
+  "hex-to-uf2",
+  "--input-path",
+  "RoKi-right.hex",
+  "--output-path",
+  "RoKi-right.uf2",
+  "--family",
+  "nrf52840",
+]
+dependencies = ["hex-to-uf2", "objcopy-right"]
 
 [tasks.objcopy-dongle]
-install_crate = { crate_name = "cargo-binutils", binary = "cargo", test_arg = ["objcopy", "--help"] }
-command = "cargo"
-args = ["objcopy", "--release", "--bin", "dongle", "--", "-O", "ihex", "RoKi-dongle.hex"]
-dependencies = ["build"]
+command = "rust-objcopy"
+args = [
+  "-O",
+  "ihex",
+  "target/thumbv7em-none-eabihf/release/dongle",
+  "RoKi-dongle.hex",
+]
+dependencies = ["build-keyboard"]
 
 [tasks.uf2-dongle]
-install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = ["hex-to-uf2", "--help"] }
 command = "cargo"
-args = ["hex-to-uf2", "--input-path", "RoKi-dongle.hex", "--output-path", "RoKi-dongle.uf2", "--family", "nrf52840"]
-dependencies = ["objcopy-dongle"]
+args = [
+  "hex-to-uf2",
+  "--input-path",
+  "RoKi-dongle.hex",
+  "--output-path",
+  "RoKi-dongle.uf2",
+  "--family",
+  "nrf52840",
+]
+dependencies = ["hex-to-uf2", "objcopy-dongle"]
+
+[tasks.objcopy-trackball]
+command = "rust-objcopy"
+args = [
+  "-O",
+  "ihex",
+  "target/thumbv7em-none-eabihf/release/trackball",
+  "RoKi-trackball.hex",
+]
+dependencies = ["build-trackball"]
+
+[tasks.uf2-trackball]
+command = "cargo"
+args = [
+  "hex-to-uf2",
+  "--input-path",
+  "RoKi-trackball.hex",
+  "--output-path",
+  "RoKi-trackball.uf2",
+  "--family",
+  "nrf52840",
+]
+dependencies = ["hex-to-uf2", "objcopy-trackball"]
+
+[tasks.rm-hex]
+command = "find"
+args = [".", "-name", "*.hex", "-type", "f", "-delete"]
 
 [tasks.uf2]
-dependencies = ["uf2-left", "uf2-right", "uf2-dongle"]
+dependencies = ["uf2-left", "uf2-right", "uf2-dongle", "uf2-trackball"]
+run_task = "rm-hex"
 
-# --- Debug: halves with logs over USB serial (no defmt) ----------------------
+# --- Debug: logs over USB serial (no defmt) -----------------------------------
 [tasks.build-left-usblog]
+cwd = "keyboard"
 command = "cargo"
-args = ["build", "--release", "--no-default-features", "--features", "usb_log", "--bin", "left", "--target-dir", "target/usblog"]
+args = [
+  "build",
+  "--release",
+  "--no-default-features",
+  "--features",
+  "usb_log",
+  "--bin",
+  "left",
+  "--target-dir",
+  "../target/usblog",
+]
 dependencies = ["install-llvm-tools", "flip-link"]
 
 [tasks.objcopy-left-usblog]
-command = "arm-none-eabi-objcopy"
-args = ["-O", "ihex", "target/usblog/thumbv7em-none-eabihf/release/left", "RoKi-left-usblog.hex"]
+command = "rust-objcopy"
+args = [
+  "-O",
+  "ihex",
+  "target/usblog/thumbv7em-none-eabihf/release/left",
+  "RoKi-left-usblog.hex",
+]
 dependencies = ["build-left-usblog"]
 
 [tasks.uf2-left-usblog]
-install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = ["hex-to-uf2", "--help"] }
 command = "cargo"
-args = ["hex-to-uf2", "--input-path", "RoKi-left-usblog.hex", "--output-path", "RoKi-left-usblog.uf2", "--family", "nrf52840"]
-dependencies = ["objcopy-left-usblog"]
+args = [
+  "hex-to-uf2",
+  "--input-path",
+  "RoKi-left-usblog.hex",
+  "--output-path",
+  "RoKi-left-usblog.uf2",
+  "--family",
+  "nrf52840",
+]
+dependencies = ["hex-to-uf2", "objcopy-left-usblog"]
 
 [tasks.build-right-usblog]
+cwd = "keyboard"
 command = "cargo"
-args = ["build", "--release", "--no-default-features", "--features", "usb_log", "--bin", "right", "--target-dir", "target/usblog"]
+args = [
+  "build",
+  "--release",
+  "--no-default-features",
+  "--features",
+  "usb_log",
+  "--bin",
+  "right",
+  "--target-dir",
+  "../target/usblog",
+]
 dependencies = ["install-llvm-tools", "flip-link"]
 
 [tasks.objcopy-right-usblog]
-command = "arm-none-eabi-objcopy"
-args = ["-O", "ihex", "target/usblog/thumbv7em-none-eabihf/release/right", "RoKi-right-usblog.hex"]
+command = "rust-objcopy"
+args = [
+  "-O",
+  "ihex",
+  "target/usblog/thumbv7em-none-eabihf/release/right",
+  "RoKi-right-usblog.hex",
+]
 dependencies = ["build-right-usblog"]
 
 [tasks.uf2-right-usblog]
-install_crate = { crate_name = "cargo-hex-to-uf2", binary = "cargo", test_arg = ["hex-to-uf2", "--help"] }
 command = "cargo"
-args = ["hex-to-uf2", "--input-path", "RoKi-right-usblog.hex", "--output-path", "RoKi-right-usblog.uf2", "--family", "nrf52840"]
-dependencies = ["objcopy-right-usblog"]
+args = [
+  "hex-to-uf2",
+  "--input-path",
+  "RoKi-right-usblog.hex",
+  "--output-path",
+  "RoKi-right-usblog.uf2",
+  "--family",
+  "nrf52840",
+]
+dependencies = ["hex-to-uf2", "objcopy-right-usblog"]
+
+[tasks.build-trackball-usblog]
+cwd = "trackball"
+command = "cargo"
+args = [
+  "build",
+  "--release",
+  "--no-default-features",
+  "--features",
+  "usb_log",
+  "--target-dir",
+  "../target/usblog",
+]
+dependencies = ["install-llvm-tools", "flip-link"]
+
+[tasks.objcopy-trackball-usblog]
+command = "rust-objcopy"
+args = [
+  "-O",
+  "ihex",
+  "target/usblog/thumbv7em-none-eabihf/release/trackball",
+  "RoKi-trackball-usblog.hex",
+]
+dependencies = ["build-trackball-usblog"]
+
+[tasks.uf2-trackball-usblog]
+command = "cargo"
+args = [
+  "hex-to-uf2",
+  "--input-path",
+  "RoKi-trackball-usblog.hex",
+  "--output-path",
+  "RoKi-trackball-usblog.uf2",
+  "--family",
+  "nrf52840",
+]
+dependencies = ["hex-to-uf2", "objcopy-trackball-usblog"]
 
 [tasks.uf2-usblog]
-dependencies = ["uf2-left-usblog", "uf2-right-usblog"]
+dependencies = ["uf2-left-usblog", "uf2-right-usblog", "uf2-trackball-usblog"]
+run_task = "rm-hex"

@@ -1,0 +1,60 @@
+[package]
+name = "roki"
+description = "RMK firmware for the RoKi split ergonomic keyboard (nice!nano v2 halves + USB dongle)"
+readme = "../README.md"
+version.workspace = true
+authors.workspace = true
+repository.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# `dongle` is enabled on every binary: on the keyboard (central) it adds the
+# dongle bond slot + the `SwitchToDongle` key; on the dongle it enables
+# `rmk::dongle`. `vial` must be on both sides so the dongle relays Vial.
+rmk = { version = "0.9", default-features = false, features = [
+    "storage", "vial", "host_lock", "watchdog", "nrf52840_ble", "split",
+    "dongle", "async_matrix", "adafruit_bl",
+] }
+nrf-sdc.workspace = true
+nrf-mpsl.workspace = true
+bt-hci.workspace = true
+cortex-m.workspace = true
+cortex-m-rt.workspace = true
+embassy-time.workspace = true
+embassy-nrf.workspace = true
+embassy-executor.workspace = true
+embassy-sync.workspace = true
+defmt = { workspace = true, optional = true }
+defmt-rtt = { workspace = true, optional = true }
+panic-probe = { workspace = true, optional = true }
+log.workspace = true
+static_cell.workspace = true
+
+[features]
+default = ["defmt"]
+# Normal build: defmt over RTT (needs a debug probe to read).
+defmt = ["dep:defmt", "dep:defmt-rtt", "dep:panic-probe", "rmk/defmt", "nrf-sdc/defmt", "nrf-mpsl/defmt", "bt-hci/defmt", "embassy-nrf/defmt", "embassy-time/defmt", "embassy-time/defmt-timestamp-uptime", "embassy-executor/defmt"]
+# Debug build: logs over a USB CDC serial port instead of defmt.
+usb_log = ["rmk/usb_log"]
+
+[build-dependencies]
+xz2.workspace = true
+json.workspace = true
+const-gen.workspace = true
+
+# Left half: split central, the keyboard itself (talks to hosts and the dongle)
+[[bin]]
+name = "left"
+path = "src/left.rs"
+
+# Right half: split peripheral 0
+[[bin]]
+name = "right"
+path = "src/right.rs"
+
+# USB dongle: relays the bonded keyboard (HID + Vial) to the host
+[[bin]]
+name = "dongle"
+path = "src/dongle.rs"

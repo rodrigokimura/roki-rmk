@@ -7,4 +7,4 @@ target = "thumbv7em-none-eabihf"
 
 [env]
 DEFMT_LOG = "info"
-KEYBOARD_TOML_PATH =  { value = "keyboard.toml", relative = true }
+# KEYBOARD_TOML_PATH is set per crate in keyboard/.cargo and trackball/.cargo

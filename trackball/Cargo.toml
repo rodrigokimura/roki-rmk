@@ -1,0 +1,44 @@
+[package]
+name = "roki-trackball"
+description = "RMK firmware for the RoKi standalone BLE trackball (nice!nano v2 + PMW3360 + 4 buttons)"
+readme = "../README.md"
+version.workspace = true
+authors.workspace = true
+repository.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+# No `split`, no `dongle`: a plain BLE (and USB) HID mouse with Vial.
+rmk = { version = "0.9", default-features = false, features = [
+    "storage", "vial", "host_lock", "watchdog", "nrf52840_ble", "async_matrix", "adafruit_bl",
+] }
+nrf-sdc.workspace = true
+nrf-mpsl.workspace = true
+bt-hci.workspace = true
+cortex-m.workspace = true
+cortex-m-rt.workspace = true
+embassy-time.workspace = true
+embassy-nrf.workspace = true
+embassy-executor.workspace = true
+embassy-sync.workspace = true
+defmt = { workspace = true, optional = true }
+defmt-rtt = { workspace = true, optional = true }
+panic-probe = { workspace = true, optional = true }
+log.workspace = true
+static_cell.workspace = true
+
+[features]
+default = ["defmt"]
+defmt = ["dep:defmt", "dep:defmt-rtt", "dep:panic-probe", "rmk/defmt", "nrf-sdc/defmt", "nrf-mpsl/defmt", "bt-hci/defmt", "embassy-nrf/defmt", "embassy-time/defmt", "embassy-time/defmt-timestamp-uptime", "embassy-executor/defmt"]
+usb_log = ["rmk/usb_log"]
+
+[build-dependencies]
+xz2.workspace = true
+json.workspace = true
+const-gen.workspace = true
+
+[[bin]]
+name = "trackball"
+path = "src/main.rs"

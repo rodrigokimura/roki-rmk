@@ -222,7 +222,7 @@ async fn main(spawner: Spawner) {
     // --- Encoder 1 --------------------------------------------------------
     let enc_a = Input::new(p.P0_17, Pull::Up);
     let enc_b = Input::new(p.P0_20, Pull::Up);
-    let mut encoder = RotaryEncoder::with_resolution(enc_a, enc_b, 2, false, 1);
+    let mut encoder = RotaryEncoder::with_resolution(enc_a, enc_b, 4, false, 1);
 
     // --- ADC: joystick (P0.31 X, P0.29 Y) + battery (VDDH/5) --------------
     interrupt::SAADC.set_priority(interrupt::Priority::P3);
