@@ -144,7 +144,7 @@ async fn main(spawner: Spawner) {
         start_addr: 0xA0000,
         num_sectors: 32,
         clear_storage: false,
-        clear_layout: false,
+        clear_layout: true,
     };
     let flash = Flash::take(mpsl, p.NVMC);
 
@@ -189,7 +189,7 @@ async fn main(spawner: Spawner) {
     // --- Encoder 0 --------------------------------------------------------
     let enc_a = Input::new(p.P0_17, Pull::Up);
     let enc_b = Input::new(p.P0_20, Pull::Up);
-    let mut encoder = RotaryEncoder::with_resolution(enc_a, enc_b, 2, false, 0);
+    let mut encoder = RotaryEncoder::with_resolution(enc_a, enc_b, 4, false, 0);
 
     // --- ADC: joystick (P0.31 X, P0.29 Y) + battery (VDDH/5) --------------
     interrupt::SAADC.set_priority(interrupt::Priority::P3);
