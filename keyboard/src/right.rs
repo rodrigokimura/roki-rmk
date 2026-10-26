@@ -224,7 +224,7 @@ async fn main(spawner: Spawner) {
     // boot key. Hold either at power-on to drop into the bootloader.
     row_pins[0].set_high();
     embassy_time::Timer::after_micros(50).await;
-    let boot_key_held = col_pins[0].is_high();
+    let boot_key_held = col_pins[5].is_high();
     row_pins[0].set_low();
     if boot_key_held || direct_pin.is_low() {
         rmk::boot::jump_to_bootloader();
