@@ -128,6 +128,9 @@ col_pins = ["P0_02", "P1_15", "P1_13", "P1_11", "P0_10", "P0_09"]
 # wired by hand in src/left.rs (DirectPinMatrix); kept here for documentation.
 direct_pins = [["P0_22"]]
 direct_pin_low_active = true
+# Hold the top-left key (Esc) — or the P0_22 direct key — at power-on to drop
+# into the bootloader. Hand-implemented in src/left.rs (rmk::boot).
+bootmagic = [0, 0]
 
 [[split.central.input_device.encoder]]
 pin_a = "P0_17"
@@ -153,6 +156,9 @@ col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
 # src/right.rs (DirectPinMatrix); kept here for documentation.
 direct_pins = [["P0_22"]]
 direct_pin_low_active = true
+# Hold this half's top-left key (`6`) — or the P0_22 direct key — at power-on
+# to drop into the bootloader. Hand-implemented in src/right.rs (rmk::boot).
+bootmagic = [0, 0]
 
 [[split.peripheral.input_device.encoder]]
 pin_a = "P0_17"

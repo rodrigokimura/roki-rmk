@@ -201,7 +201,7 @@ async fn main(spawner: Spawner) {
     info!("[boot] storage ready");
 
     // --- Matrix (row2col) — pins per keyboard.toml [[split.peripheral]] ---
-    let row_pins = [
+    let mut row_pins = [
         Output::new(p.P0_24, Level::Low, OutputDrive::Standard),
         Output::new(p.P1_00, Level::Low, OutputDrive::Standard),
         Output::new(p.P0_11, Level::Low, OutputDrive::Standard),
@@ -216,6 +216,20 @@ async fn main(spawner: Spawner) {
         Input::new(p.P1_15, Pull::Down),
         Input::new(p.P0_02, Pull::Down),
     ];
+    let direct_pin = Input::new(p.P0_22, Pull::Up);
+
+    // --- Bootmagic (keyboard.toml `bootmagic = (0, 0)`, hand-implemented) ---
+    // Same check RMK's macro generates: drive row 0, read col 0 — this
+    // half's top-left key (the `6` key). The P0.22 direct key doubles as a
+    // boot key. Hold either at power-on to drop into the bootloader.
+    row_pins[0].set_high();
+    embassy_time::Timer::after_micros(50).await;
+    let boot_key_held = col_pins[0].is_high();
+    row_pins[0].set_low();
+    if boot_key_held || direct_pin.is_low() {
+        rmk::boot::jump_to_bootloader();
+    }
+
     let debouncer = DefaultDebouncer::new();
     // Local 5x6; the central places us at col_offset 6 (PeripheralMatrixConfig).
     let mut matrix = Matrix::<_, _, _, 5, 6, false>::new(row_pins, col_pins, debouncer);
@@ -224,7 +238,7 @@ async fn main(spawner: Spawner) {
     // Extra key wired straight to P0_22 (switch to GND), scanned alongside
     // the row/col matrix; the central adds col_offset 6 to the position.
     let mut direct_matrix = DirectPinMatrix::<_, _, 1, 1, 1, 5, 0>::new(
-        [[Some(Input::new(p.P0_22, Pull::Up))]],
+        [[Some(direct_pin)]],
         DefaultDebouncer::new(),
         true, // low active
     );

@@ -107,6 +107,12 @@ To build directly with cargo, run from the crate directory
 Double-tap reset on each nice!nano → drag the matching `.uf2` onto the `NICENANO` drive.
 The red LED blinks while the board is in the bootloader.
 
+Alternatively, **bootmagic**: hold a half's top-left key (Esc on the left,
+`6` on the right) or its `P0.22` direct key while plugging it in / resetting
+it, and that half boots straight into the bootloader. Hand-implemented in
+`left.rs`/`right.rs` via `rmk::boot::jump_to_bootloader()` (documented as
+`bootmagic = [0, 0]` in `keyboard.toml`).
+
 The halves pair with each other automatically on first boot (no `ble_addr`
 needed); the buzzer chirps on both sides when the split link is up.
 
