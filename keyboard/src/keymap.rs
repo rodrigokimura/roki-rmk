@@ -33,8 +33,8 @@ pub const fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
             [mo!(1),     k!(Z),   k!(X),   k!(C),   k!(V),   k!(B),        k!(N),   k!(M),   k!(Comma), k!(Dot), k!(Backslash), mo!(1)],
             [k!(LCtrl),  k!(LGui), k!(LAlt), k!(Space), k!(Enter), k!(AudioMute),   k!(AudioMute), k!(Backspace), k!(Space), k!(RAlt), k!(RGui), k!(RCtrl)],
             // Direct-pin keys: (5, 0) = left P0.22, (5, 6) = right P0.22.
-            [k!(A), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent),
-                k!(B), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
+            [k!(MouseBtn1), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent),
+                k!(MouseBtn1), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent), a!(Transparent)],
         ],
         // Layer 1
         [
