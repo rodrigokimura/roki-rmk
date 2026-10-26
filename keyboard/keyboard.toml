@@ -32,3 +32,35 @@ subs = 2
 
 [event.connection_status_change]
 subs = 3
+
+# Battery identification over BLE. With these set, the central's GATT table
+# exposes one Battery Service per half, each with its own Characteristic User
+# Description ("RoKi Left" / "RoKi Right"), and the right half's level —
+# already forwarded over the split link — is reported separately.
+# (Default: a single characteristic described as "Central".)
+#
+# Only the battery_* keys are read from these sections; rows/cols/matrix are
+# required by RMK's TOML schema but unused by the hand-written firmware.
+[split]
+connection = "ble"
+
+[split.central]
+rows = 5
+cols = 6
+row_offset = 0
+col_offset = 0
+battery_user_description = "RoKi Left"
+[split.central.matrix]
+
+[[split.peripheral]]
+rows = 5
+cols = 6
+row_offset = 0
+col_offset = 6
+# The right half measures VDDH/5 internally (see right.rs) — there is no
+# real ADC pin. RMK's schema requires battery_adc_pin to pair with the
+# description and uses it to include this peripheral in
+# SPLIT_BATTERY_PERIPHERAL_IDS, so this is a placeholder string.
+battery_adc_pin = "VDDH"
+battery_user_description = "RoKi Right"
+[split.peripheral.matrix]

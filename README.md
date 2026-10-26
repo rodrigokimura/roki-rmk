@@ -39,7 +39,12 @@ Three nice!nano v2 (nRF52840) boards. Each **half** has:
 - **Encoder**: `P0.17` / `P0.20`, internal pull-up, resolution 2
 - **Joystick**: `P0.31` X / `P0.29` Y, rotated 45° (left CCW, right CW)
 - **Buzzer**: piezo on `P0.06`, connect/disconnect tones
-- **Battery**: VDDH/5 via SAADC (sampled every 30 s)
+- **Battery**: VDDH/5 via SAADC (sampled every 30 s). Over a direct BLE host
+  connection each half reports separately: the central's GATT table exposes
+  one Battery Service per half, described "RoKi Left" / "RoKi Right"
+  (`battery_user_description` in `keyboard.toml`); the right half's level is
+  forwarded over the split link. Via the dongle/USB there is no battery
+  service (USB HID has no standard for it)
 
 The **dongle** is a bare nice!nano on USB — no matrix, no peripherals.
 
