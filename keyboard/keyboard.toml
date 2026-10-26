@@ -1,184 +1,29 @@
-# RoKi — RMK v0.9 configuration
+# RoKi — RMK build-time constants.
 #
-# Topology (v0.9 native dongle):
-#   left   = split central (the keyboard: BLE host profiles + dongle bond slot)
-#   right  = split peripheral 0
-#   dongle = USB relay, bonded to the left half (see src/dongle.rs)
+# Read by rmk-types' build.rs (via KEYBOARD_TOML_PATH, set in this crate's
+# .cargo/config.toml) to generate the compile-time constants rmk includes
+# (NUM_BLE_PROFILE, SPLIT_PERIPHERALS_NUM, event channel sizes, …).
 #
-# The Rust binaries hand-write the wiring, but this file is still the single
-# source of truth for layout/keymap constants (read by rmk-types' build.rs via
-# KEYBOARD_TOML_PATH) and documents the pins.
+# Everything else about the keyboard — layout, keymap, pins, split wiring,
+# encoders, direct-pin keys, bootmagic — is hand-written in src/ and
+# documented in README.md; putting it here would have no effect, because the
+# firmware does not use RMK's macro codegen.
+#
+# The sections below exist only because RMK's default event-channel sizes
+# cover just its own built-in devices; the hand-written devices in src/
+# exceed them (a shortfall panics at boot with "Failed to create
+# publisher/subscriber for …").
 
-[keyboard]
-name = "RoKi"
-product_name = "RoKi Keyboard"
-vendor_id = 0x4c4b
-product_id = 0x524b
-manufacturer = "RoKi"
-chip = "nrf52840"
-
-[rmk]
-ble_profiles_num = 3
-split_peripherals_num = 1
-# Seconds per dongle pairing window (dongle build only). Default 30.
-dongle_pairing_window_secs = 30
-
-[host]
-unlock_keys = [[0, 0], [0, 11]]
-
-[layout]
-rows = 6
-cols = 12
-map = """
-(0, 0) (0, 1) (0, 2) (0, 3) (0, 4) (0, 5)    (0, 6) (0, 7) (0, 8) (0, 9) (0, 10) (0, 11)
-(1, 0) (1, 1) (1, 2) (1, 3) (1, 4) (1, 5)    (1, 6) (1, 7) (1, 8) (1, 9) (1, 10) (1, 11)
-(2, 0) (2, 1) (2, 2) (2, 3) (2, 4) (2, 5)    (2, 6) (2, 7) (2, 8) (2, 9) (2, 10) (2, 11)
-(3, 0) (3, 1) (3, 2) (3, 3) (3, 4) (3, 5)    (3, 6) (3, 7) (3, 8) (3, 9) (3, 10) (3, 11)
-
-(4, 0) (4, 1) (4, 2) (4, 3) (4, 4) (4, 5)    (4, 6) (4, 7) (4, 8) (4, 9) (4, 10) (4, 11)
-
-(5, 0) (5, 1) (5, 2) (5, 3) (5, 4) (5, 5)    (5, 6) (5, 7) (5, 8) (5, 9) (5, 10) (5, 11)
-"""
-# Row 5 is the direct-pin row: only (5, 0) on the left half and (5, 6) on the
-# right half have physical keys (wired straight to P0_22, see direct_pins
-# under each split matrix below). The rest of the row is padding.
-
-[keymap]
-layers = 2
-
-[[keymap.layer]] # Layer 0
-keys = """
-esc   1     2     3     4     5                         6     7     8     9     0     esc
-Tab   Q     W     E     R     T                         Y     U     I     O     P     Grave
-lsft  A     S     D     F     G                         H     J     K     L     slsh  rsft
-MO(1) Z     X     C     V     B                         N     M     comm  .     bsls  MO(1)
-
-        lctl  lwin  LAlt  spc   ent   encp0     encp1  bspc  spc   RAlt  rwin    rctl
-
-        _     _     _     _     _     _         _      _     _     _     _       _
-"""
-encoders = [["enc_0", "enc_1"], ["enc_2", "enc_3"]]
-
-[[keymap.layer]] # Layer 1
-# Thumb row, left:  ble0 ble1 ble2 = switch to BLE profile 0/1/2 (hold 5 s: clear that bond)
-#                   clrb = clear bond of the current profile
-# Thumb row, right: dongle = switch to the dongle slot (hold 5 s: clear dongle bond)
-keys = """
-F1    F2    F3    F4    F5    F6                        F7    F8    F9    F10   F11   F12
-_     brsls brqst clk2  clk3  clk1                      clk1  clk3  clk2  _     _     _
-_     Quote _     rbrc  bsls  _                         Left  Down  Up    Right _     _
-_     _     _     scln  _     _                         Minus Equal lbrc  _     _     _
-
-        ble0  ble1  ble2  _     clrb  encp2     encp3   del   _     _     _       dongle
-
-        _     _     _     _     _     _         _      _     _     _     _       _
-"""
-encoders = [["enc_4", "enc_5"], ["enc_6", "enc_7"]]
-
-[aliases]
-clk1 = "ms_btn1"
-clk2 = "ms_btn2"
-clk3 = "ms_btn3"
-brsls = "kp_slash"
-brqst = "WM(int1, lsft)"
-enc_0 = "Macro(0)"
-enc_1 = "Macro(1)"
-enc_2 = "Macro(2)"
-enc_3 = "Macro(3)"
-enc_4 = "Macro(4)"
-enc_5 = "Macro(5)"
-enc_6 = "Macro(6)"
-enc_7 = "Macro(7)"
-encp0 = "Macro(8)"
-encp1 = "Macro(9)"
-encp2 = "Macro(10)"
-encp3 = "Macro(11)"
-# With ble_profiles_num = N: User(0..N-1) = profile, User(N+2) = clear current
-# bond, User(N+5) = SwitchToDongle.  N = 3 here.
-ble0 = "User(0)"
-ble1 = "User(1)"
-ble2 = "User(2)"
-clrb = "User(5)"
-dongle = "User(8)"
-
-[ble]
-enabled = true
-default_tx_power = 0
-
-[storage]
-enabled = true
-clear_storage = false
-
-[split]
-connection = "ble"
-
-# Left half: central. No ble_addr — the dongle setup bonds by pairing.
-[split.central]
-rows = 5
-cols = 6
-row_offset = 0
-col_offset = 0
-[split.central.matrix]
-row2col = true
-row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
-col_pins = ["P0_02", "P1_15", "P1_13", "P1_11", "P0_10", "P0_09"]
-# Extra key wired directly to P0_22 (switch to GND), scanned alongside the
-# row/col matrix as a 1x1 direct-pin matrix at unified position (5, 0).
-# RMK's TOML schema can't mix a normal matrix with direct pins, so this is
-# wired by hand in src/left.rs (DirectPinMatrix); kept here for documentation.
-direct_pins = [["P0_22"]]
-direct_pin_low_active = true
-# Hold the top-left key (Esc) — or the P0_22 direct key — at power-on to drop
-# into the bootloader. Hand-implemented in src/left.rs (rmk::boot).
-bootmagic = [0, 0]
-
-[[split.central.input_device.encoder]]
-pin_a = "P0_17"
-pin_b = "P0_20"
-phase = "resolution"
-resolution = 2
-reverse = false
-internal_pullup = true
-
-# Right half: peripheral 0
-[[split.peripheral]]
-rows = 5
-cols = 6
-row_offset = 0
-col_offset = 6
-[split.peripheral.matrix]
-row2col = true
-row_pins = ["P0_24", "P1_00", "P0_11", "P1_04", "P1_06"]
-col_pins = ["P0_09", "P0_10", "P1_11", "P1_13", "P1_15", "P0_02"]
-# Extra key wired directly to P0_22 (switch to GND), scanned alongside the
-# row/col matrix as a 1x1 direct-pin matrix. Local position (5, 0); the
-# central maps it to unified (5, 6) via col_offset. Hand-wired in
-# src/right.rs (DirectPinMatrix); kept here for documentation.
-direct_pins = [["P0_22"]]
-direct_pin_low_active = true
-# Hold this half's top-left key (`6`) — or the P0_22 direct key — at power-on
-# to drop into the bootloader. Hand-implemented in src/right.rs (rmk::boot).
-bootmagic = [0, 0]
-
-[[split.peripheral.input_device.encoder]]
-pin_a = "P0_17"
-pin_b = "P0_20"
-phase = "resolution"
-resolution = 2
-reverse = false
-internal_pullup = true
-
-# Extra event subscribers for the hand-written processors in src/devices.rs
-# (RMK's defaults only cover its own built-in subscribers):
-#   - pointing:                 PointingProcessor on the central
-#   - central_connected:        PeripheralBuzzer on the right half
-#   - connection_status_change: CentralBuzzer on the left half
-# Exceeding a limit panics at boot with "Failed to create subscriber for …".
 # Default keyboard-event pubs = 4; raised for the extra direct-pin matrix
-# publishing alongside the row/col matrix and the encoder on each half.
+# (P0.22) publishing alongside the row/col matrix and the encoder on each
+# half.
 [event.keyboard]
 pubs = 6
 
+# Extra subscribers beyond RMK's built-ins:
+#   - pointing:                 PointingProcessor on the central (left.rs)
+#   - central_connected:        PeripheralBuzzer on the right half (devices.rs)
+#   - connection_status_change: CentralBuzzer on the left half (devices.rs)
 [event.pointing]
 subs = 3
 

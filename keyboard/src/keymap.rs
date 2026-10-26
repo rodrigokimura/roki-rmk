@@ -3,7 +3,7 @@
 
 use rmk::types::action::{EncoderAction, KeyAction};
 use rmk::types::modifier::ModifierCombination;
-use rmk::{a, encoder, k, macros, mo, user, wm};
+use rmk::{a, encoder, k, mo, user, wm};
 
 pub(crate) const COL: usize = 12;
 pub(crate) const ROW: usize = 6;

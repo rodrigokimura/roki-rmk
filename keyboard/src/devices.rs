@@ -116,23 +116,20 @@ impl Buzzer {
     }
 
     pub async fn connected(&mut self) {
-        self.beep(3000, 50).await;
-        Timer::after_millis(15).await;
-        self.beep(2200, 70).await;
-        Timer::after_millis(15).await;
-        self.beep(1600, 90).await;
-        Timer::after_millis(20).await;
-        self.beep(1000, 120).await;
+        self.beep(2794, 100).await;
+        self.beep(2637, 100).await;
+        self.beep(2794, 100).await;
+        self.beep(2637, 100).await;
+        self.beep(2794, 100).await;
+        self.beep(2637, 100).await;
     }
 
     pub async fn disconnected(&mut self) {
-        self.beep(2000, 30).await;
-        Timer::after_millis(10).await;
-        self.beep(2600, 40).await;
-        Timer::after_millis(10).await;
-        self.beep(3200, 50).await;
-        Timer::after_millis(15).await;
-        self.beep(2400, 60).await;
+        self.beep(247, 200).await;
+        Timer::after_millis(400).await;
+        self.beep(247, 200).await;
+        Timer::after_millis(400).await;
+        self.beep(247, 200).await;
     }
 
     async fn beep(&mut self, frequency_hz: u32, duration_ms: u64) {

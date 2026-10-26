@@ -34,11 +34,11 @@ The repo is a Cargo workspace with two independent firmware crates:
 
 Three nice!nano v2 (nRF52840) boards. Each **half** has:
 
-- **Matrix**: 5×6, row2col (rows `P0.24 P1.00 P0.11 P1.04 P1.06`; columns differ per side, see `keyboard.toml`)
-- **Direct-pin key**: one extra key wired straight to `P0.22` (switch to GND), scanned alongside the row/col matrix as a 1×1 `DirectPinMatrix` (pull-up, low-active). It sits at unified position (5, 0) on the left and (5, 6) on the right — the unified layout is 6 rows × 12 cols, with row 5 otherwise unpopulated. RMK's TOML schema can't mix a normal matrix with direct pins, so it's hand-wired in `left.rs`/`right.rs` and only documented in `keyboard.toml`
+- **Matrix**: 5×6, row2col (rows `P0.24 P1.00 P0.11 P1.04 P1.06`; columns left `P0.02 P1.15 P1.13 P1.11 P0.10 P0.09`, right `P0.09 P0.10 P1.11 P1.13 P1.15 P0.02`)
+- **Direct-pin key**: one extra key wired straight to `P0.22` (switch to GND), scanned alongside the row/col matrix as a 1×1 `DirectPinMatrix` (pull-up, low-active). It sits at unified position (5, 0) on the left and (5, 6) on the right — the unified layout is 6 rows × 12 cols, with row 5 otherwise unpopulated. RMK's TOML schema can't mix a normal matrix with direct pins, so it's hand-wired in `left.rs`/`right.rs`
 - **Encoder**: `P0.17` / `P0.20`, internal pull-up, resolution 2
 - **Joystick**: `P0.31` X / `P0.29` Y, rotated 45° (left CCW, right CW)
-- **Buzzer**: piezo on `P0.06`, R2-D2 connect/disconnect chirps
+- **Buzzer**: piezo on `P0.06`, connect/disconnect tones
 - **Battery**: VDDH/5 via SAADC (sampled every 30 s)
 
 The **dongle** is a bare nice!nano on USB — no matrix, no peripherals.
@@ -68,8 +68,8 @@ and the two devices need different RMK features (`split`/`dongle` vs. none).
 | `keyboard/src/right.rs`   | Peripheral 0: matrix + direct-pin key (`P0.22`), encoder 1, joystick (CW 45°), battery, buzzer |
 | `keyboard/src/dongle.rs`  | USB dongle: `rmk::dongle::Dongle` + `UsbTransport` sharing a `DongleRouter` |
 | `keyboard/src/devices.rs` | Shared `JoystickReader` (`#[input_device]`) and buzzer `#[processor]`s |
-| `keyboard/src/keymap.rs`  | Keymap, encoder map, Vial config (kept in sync with `keyboard/keyboard.toml`) |
-| `keyboard/keyboard.toml`  | Layout/keymap/pins; read at build time for RMK constants |
+| `keyboard/src/keymap.rs`  | Keymap, encoder map, Vial config |
+| `keyboard/keyboard.toml`  | RMK build-time constants only (event channel sizes); read by rmk-types' build.rs via `KEYBOARD_TOML_PATH`. Layout/keymap/pins live in `src/` |
 | `keyboard/vial.json`      | Vial keyboard definition (compressed into the firmware by `build.rs`) |
 | `keyboard/keyboard-layout.json` | KLE source for the `vial.json` layout |
 | `keyboard/vial_config.json` | Vial `.vil` export matching the firmware defaults (load it in Vial after a storage reset) |
@@ -111,7 +111,7 @@ Alternatively, **bootmagic**: hold a half's top-left key (Esc on the left,
 `6` on the right) or its `P0.22` direct key while plugging it in / resetting
 it, and that half boots straight into the bootloader. Hand-implemented in
 `left.rs`/`right.rs` via `rmk::boot::jump_to_bootloader()` (documented as
-`bootmagic = [0, 0]` in `keyboard.toml`).
+same check RMK's `bootmagic = [0, 0]` codegen emits).
 
 The halves pair with each other automatically on first boot (no `ble_addr`
 needed); the buzzer chirps on both sides when the split link is up.
@@ -124,7 +124,7 @@ needed); the buzzer chirps on both sides when the split link is up.
    thumb cluster, outermost key). This is `SwitchToDongle` (`User(8)`): the
    keyboard switches to its dongle slot and starts seeking; the dongle pairs.
 3. From then on both sides reconnect automatically. A bonded dongle opens one
-   pairing window at power-on (30 s, `[rmk].dongle_pairing_window_secs`) and
+   pairing window at power-on (30 s, the RMK default) and
    otherwise only reconnects its bonded keyboard.
 
 **Hold the dongle key for 5 s** to clear the keyboard's dongle bond and seek a new dongle.
@@ -144,11 +144,12 @@ Three BLE profiles plus the dongle slot. On layer 1 (`MO(1)`), thumb row:
 Each slot keeps its own bond, so switching never requires re-pairing. USB
 always wins when a cable is plugged in.
 
-RMK derives these keycodes from `ble_profiles_num` (N = 3): `User(0..N-1)`
+RMK derives these keycodes from the BLE profile count (N = 3, the RMK
+default): `User(0..N-1)`
 select a profile, then `User(N)` next, `User(N+1)` previous, `User(N+2)` clear
 current bond, `User(N+3)` toggle USB/BLE preference, `User(N+4)` clear the
 split peer, `User(N+5)` switch to dongle. In Vial they appear as `USER00`…
-`USER08`. Changing `ble_profiles_num` shifts them all.
+`USER08`. Changing the profile count shifts them all.
 
 **After upgrading from v0.8**: HID report IDs changed, so forget the keyboard
 on any BLE host and re-pair.
@@ -222,9 +223,9 @@ const DEAD_ZONE: i32 = 2;    // mouse units
 
 ## Updating the keymap
 
-Edit both the crate's `keyboard.toml` (`[[keymap.layer]]`) and `src/keymap.rs` — the Rust
-binaries use the hardcoded arrays; the TOML is the documented source of truth
-and drives RMK's build-time constants. Keep `vial_config.json` in sync too.
+Edit the crate's `src/keymap.rs` — the binaries use the hardcoded arrays;
+`keyboard.toml` carries only RMK's build-time event-channel constants, not
+the keymap. Keep `vial_config.json` in sync too.
 
 The keymap is 6×12: rows 0–4 are the wired matrix, row 5 is the direct-pin
 row — only (5, 0) (left `P0.22`) and (5, 6) (right `P0.22`) have keys. Both
